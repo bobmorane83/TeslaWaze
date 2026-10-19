@@ -1,0 +1,17 @@
+# Gradle
+.gradle/
+build/
+# Android local & secrets (NE JAMAIS committer)
+local.properties
+secrets.properties
+secrets*.properties
+!secrets.properties.example
+# IDE
+.idea/
+*.iml
+captures/
+# Keystores / secrets
+*.keystore
+*.jks
+*.pem
+*.p12

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      Permissions :
+        INTERNET                      lire la destination sur le compte Tesla ;
+        FOREGROUND_SERVICE(_SPECIAL_USE) la surveillance tourne dans un service permanent ;
+        POST_NOTIFICATIONS            logo T dans la barre système (Android 13+) ;
+        KILL_BACKGROUND_PROCESSES     arrêter Waze (destination terminée / véhicule garé) ;
+        RECEIVE_BOOT_COMPLETED        relancer la surveillance après un redémarrage.
+      Aucune permission de localisation : Waze gère lui-même le GPS.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- « Afficher par-dessus les autres applications » : sans elle, Android interdit à une app
+         en arrière-plan de démarrer une activité — donc de lancer (ou de reprendre le premier
+         plan pour arrêter) Waze écran éteint. Aucun élément n'est réellement superposé. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- Android 11+ : sans cette déclaration, `getPackageInfo("com.waze")` lève
+         NameNotFoundException (filtrage de visibilité des paquets) et le lancement de
+         Waze serait refusé à tort. -->
+    <queries>
+        <package android:name="com.waze" />
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="waze" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="TeslaWaze"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.TeslaWaze">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Connexion Tesla (OAuth) : une seule fois, ou à la demande. -->
+        <activity
+            android:name=".TeslaLoginActivity"
+            android:exported="false" />
+
+        <!-- Prend le premier plan 0,5 s pour que Waze passe en arrière-plan et puisse être tué. -->
+        <activity
+            android:name=".StopWazeActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Black.NoTitleBar" />
+
+        <!-- Surveillance permanente : elle survit à l'appui sur « retour ». -->
+        <service
+            android:name=".DestinationService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="surveillance de la destination de navigation du véhicule" />
+        </service>
+
+        <!-- Accès aux notifications : sert uniquement à déclencher l'action « Éteindre » de
+             Waze quand la destination disparaît. Aucun contenu n'est lu ni conservé. -->
+        <service
+            android:name=".WazeNotificationListener"
+            android:exported="true"
+            android:label="TeslaWaze"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- Relance la surveillance après un redémarrage du téléphone (sauf si « Quitter »). -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Permet d'éteindre l'écran (lockNow) après le lancement de Waze.
+             Politique minimale : force-lock uniquement. Aucune autre capacité. -->
+        <receiver
+            android:name=".ScreenOffAdmin"
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>
