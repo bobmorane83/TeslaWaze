@@ -60,7 +60,9 @@ Aucune voiture n'est nécessaire pour la configuration, mais le test final oui.
 
 TeslaWaze n'est pas disponible sur le Play Store. Il s'installe à partir d'un fichier APK :
 
-1. Copier le fichier d'installation (`app-debug.apk`) sur le téléphone.
+1. Télécharger la dernière version depuis la page
+   [Releases](https://github.com/bobmorane83/TeslaWaze/releases/latest), ou copier le fichier
+   d'installation (`app-debug.apk`) sur le téléphone.
 2. L'ouvrir depuis l'explorateur de fichiers.
 3. Si Android le demande, autoriser l'installation depuis cette source.
 4. Toucher **Installer**, puis **Ouvrir**.

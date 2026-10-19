@@ -5,11 +5,17 @@
 ![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white)
 ![Sans root](https://img.shields.io/badge/root-non%20requis-success)
 ![Sans GPS](https://img.shields.io/badge/localisation-non%20requise-informational)
+[![Dernière version](https://img.shields.io/github/v/release/bobmorane83/TeslaWaze)](https://github.com/bobmorane83/TeslaWaze/releases/latest)
 
 TeslaWaze lance Waze en arrière-plan pour vous prévenir des événements signalés par la
 communauté (police, danger, bouchon…), **sans guidage vocal**. Le calculateur d'itinéraire de la
 Tesla reste la référence : Waze reçoit la destination pour connaître le trajet, puis se contente
 d'annoncer les événements. Quand le trajet est terminé, Waze se referme.
+
+## Téléchargement
+
+📦 **[Télécharger la dernière version (APK)](https://github.com/bobmorane83/TeslaWaze/releases/latest)**
+— version **0.1.0**, APK de développement à installer manuellement.
 
 > 📘 **Guide d'utilisation complet (première installation pas à pas) :
 > [Guide.md](Guide.md)**
