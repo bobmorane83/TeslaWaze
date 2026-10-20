@@ -9,7 +9,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +16,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -214,7 +217,6 @@ private fun WazeScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .clickable { showSettings = true }
                 .padding(28.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -236,11 +238,24 @@ private fun WazeScreen() {
                 color = if (running) ColTeal else ColWazeText,
                 fontSize = 12.sp
             )
-            Spacer(Modifier.height(28.dp))
-            Text("Toucher l'écran pour les réglages", color = ColTealDim, fontSize = 12.sp)
         }
 
-        // Hors de la zone cliquable : un appui ici ne doit pas ouvrir les réglages.
+        // Réglages : accessibles uniquement par l'icône engrenage en haut à droite.
+        TextButton(
+            onClick = { showSettings = true },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 8.dp, end = 8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Settings,
+                contentDescription = "Réglages",
+                tint = ColTeal,
+                modifier = Modifier.size(28.dp)
+            )
+        }
+
+        // Bouton « Quitter », en bas de l'écran.
         TextButton(
             onClick = { quit() },
             modifier = Modifier
