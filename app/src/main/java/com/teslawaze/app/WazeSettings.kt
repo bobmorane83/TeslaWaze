@@ -23,13 +23,42 @@ data class WazeSettings(
      * les endpoints par identifiant (`/api/1/vehicles/{id}` et `vehicle_data`) répondent
      * encore à un jeton legacy.
      */
-    val teslaVehicleId: Long = 0L
+    val teslaVehicleId: Long = 0L,
+    /** Intervalle de lecture quand le véhicule est en ligne (secondes). */
+    val pollOnlineSec: Int = DEFAULT_POLL_ONLINE_SEC,
+    /** Intervalle de lecture quand le véhicule est endormi/hors ligne (secondes). */
+    val pollAsleepSec: Int = DEFAULT_POLL_ASLEEP_SEC,
+    /** Intervalle de lecture après une erreur (secondes). */
+    val pollErrorSec: Int = DEFAULT_POLL_ERROR_SEC
 ) {
+    fun pollOnlineMs(): Long = clampPollOnlineSec(pollOnlineSec) * 1000L
+    fun pollAsleepMs(): Long = clampPollAsleepSec(pollAsleepSec) * 1000L
+    fun pollErrorMs(): Long = clampPollErrorSec(pollErrorSec) * 1000L
+
     companion object {
         const val DEFAULT_SCREEN_OFF = true
 
         /** Hôte utilisé par TeslaMate (`get/2`, `get_with_state/2`). */
         const val DEFAULT_TESLA_API_BASE = "https://owner-api.teslamotors.com"
+
+        const val DEFAULT_POLL_ONLINE_SEC = 60
+        const val DEFAULT_POLL_ASLEEP_SEC = 30
+        const val DEFAULT_POLL_ERROR_SEC = 30
+        const val MIN_POLL_SEC = 10
+        /** Plafond : le double de la valeur par défaut. */
+        const val MAX_POLL_ONLINE_SEC = DEFAULT_POLL_ONLINE_SEC * 2
+        const val MAX_POLL_ASLEEP_SEC = DEFAULT_POLL_ASLEEP_SEC * 2
+        const val MAX_POLL_ERROR_SEC = DEFAULT_POLL_ERROR_SEC * 2
+        const val POLL_STEP_SEC = 5
+
+        fun clampPollOnlineSec(value: Int): Int =
+            value.coerceIn(MIN_POLL_SEC, MAX_POLL_ONLINE_SEC)
+
+        fun clampPollAsleepSec(value: Int): Int =
+            value.coerceIn(MIN_POLL_SEC, MAX_POLL_ASLEEP_SEC)
+
+        fun clampPollErrorSec(value: Int): Int =
+            value.coerceIn(MIN_POLL_SEC, MAX_POLL_ERROR_SEC)
     }
 }
 
@@ -48,7 +77,16 @@ class SettingsStore(context: Context) {
         teslaClientId = prefs.getString(KEY_CLIENT_ID, null) ?: BuildConfig.TESLA_CLIENT_ID,
         teslaRedirectUri = prefs.getString(KEY_REDIRECT_URI, null)
             ?: BuildConfig.TESLA_REDIRECT_URI,
-        teslaVehicleId = prefs.getString(KEY_VEHICLE_ID, null)?.toLongOrNull() ?: 0L
+        teslaVehicleId = prefs.getString(KEY_VEHICLE_ID, null)?.toLongOrNull() ?: 0L,
+        pollOnlineSec = WazeSettings.clampPollOnlineSec(
+            prefs.getInt(KEY_POLL_ONLINE, WazeSettings.DEFAULT_POLL_ONLINE_SEC)
+        ),
+        pollAsleepSec = WazeSettings.clampPollAsleepSec(
+            prefs.getInt(KEY_POLL_ASLEEP, WazeSettings.DEFAULT_POLL_ASLEEP_SEC)
+        ),
+        pollErrorSec = WazeSettings.clampPollErrorSec(
+            prefs.getInt(KEY_POLL_ERROR, WazeSettings.DEFAULT_POLL_ERROR_SEC)
+        )
     )
 
     fun save(s: WazeSettings) {
@@ -59,6 +97,9 @@ class SettingsStore(context: Context) {
             .putString(KEY_CLIENT_ID, s.teslaClientId)
             .putString(KEY_REDIRECT_URI, s.teslaRedirectUri)
             .putString(KEY_VEHICLE_ID, s.teslaVehicleId.toString())
+            .putInt(KEY_POLL_ONLINE, WazeSettings.clampPollOnlineSec(s.pollOnlineSec))
+            .putInt(KEY_POLL_ASLEEP, WazeSettings.clampPollAsleepSec(s.pollAsleepSec))
+            .putInt(KEY_POLL_ERROR, WazeSettings.clampPollErrorSec(s.pollErrorSec))
             .apply()
     }
 
@@ -78,6 +119,9 @@ class SettingsStore(context: Context) {
         const val KEY_CLIENT_ID = "tesla_client_id"
         const val KEY_REDIRECT_URI = "tesla_redirect_uri"
         const val KEY_VEHICLE_ID = "tesla_vehicle_id"
+        const val KEY_POLL_ONLINE = "poll_online_sec"
+        const val KEY_POLL_ASLEEP = "poll_asleep_sec"
+        const val KEY_POLL_ERROR = "poll_error_sec"
         const val KEY_SERVICE = "service_enabled"
     }
 }

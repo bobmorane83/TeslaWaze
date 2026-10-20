@@ -41,10 +41,6 @@ class DestinationService : Service() {
         private const val TAG = "TeslaWaze"
         const val ACTION_STOP = "com.teslawaze.app.action.STOP"
 
-        const val POLL_ASLEEP_MS = 30_000L
-        const val POLL_ONLINE_MS = 60_000L
-        const val POLL_ERROR_MS = 30_000L
-
         /** Lectures concordantes avant d'arrêter Waze (un recalcul de route rend la valeur nulle). */
         private const val STOP_CONFIRMATIONS = 2
 
@@ -140,10 +136,11 @@ class DestinationService : Service() {
         var vehicleId = session.vehicleId()
 
         while (currentCoroutineContext().isActive) {
+            val settings = store.load()
             val token = session.validToken()
             if (token == null) {
                 publish("Connexion Tesla requise", log = false)
-                delay(POLL_ERROR_MS)
+                delay(settings.pollErrorMs())
                 continue
             }
             val api = session.api(token)
@@ -159,7 +156,7 @@ class DestinationService : Service() {
                     vehicleId = list.firstOrNull()?.id
                     if (vehicleId == null) {
                         publish("ID véhicule manquant (Réglages → Avancé)")
-                        delay(POLL_ONLINE_MS)
+                        delay(settings.pollOnlineMs())
                         continue
                     }
                     session.saveVehicleId(vehicleId)
@@ -170,9 +167,9 @@ class DestinationService : Service() {
                 val state = api.state(token.access, vehicleId)
                 if (state != "online") {
                     publish("Véhicule $state — en attente")
-                    Log.d(TAG, "tesla: state=$state -> attente ${POLL_ASLEEP_MS / 1000}s")
+                    Log.d(TAG, "tesla: state=$state -> attente ${settings.pollAsleepMs() / 1000}s")
                     apply(pilot.next(false, null, null, null))
-                    delay(POLL_ASLEEP_MS)
+                    delay(settings.pollAsleepMs())
                     continue
                 }
 
@@ -189,20 +186,20 @@ class DestinationService : Service() {
                         speedMph = drive.speedMph
                     )
                 )
-                delay(POLL_ONLINE_MS)
+                delay(settings.pollOnlineMs())
             } catch (e: TeslaAuthException) {
                 publish("Connexion Tesla expirée — rouvrez l'app")
-                delay(POLL_ERROR_MS)
+                delay(settings.pollErrorMs())
             } catch (e: TeslaVehicleUnavailable) {
                 publish("Véhicule endormi — en attente")
                 apply(pilot.next(false, null, null, null))
-                delay(POLL_ASLEEP_MS)
+                delay(settings.pollAsleepMs())
             } catch (e: CancellationException) {
                 throw e // arrêt du service : ce n'est pas une erreur
             } catch (e: Exception) {
                 publish("Tesla : ${e.javaClass.simpleName}")
                 Log.w(TAG, "tesla: erreur ${e.javaClass.simpleName}: ${e.message}")
-                delay(POLL_ERROR_MS)
+                delay(settings.pollErrorMs())
             }
         }
     }

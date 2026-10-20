@@ -16,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -27,14 +28,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.roundToInt
+
+/** Couleur d'avertissement (délais trop courts, etc.). */
+private val ColWarn = Color(0xFFFFB74D)
 
 /**
  * Réglages : comportement Waze, compte Tesla (connexion à la demande), URL avancées.
- * Ouvert par un **tap sur l'écran principal**.
+ * Ouvert par l'**engrenage** en haut à droite.
  */
 @Composable
 fun SettingsScreen(
@@ -100,6 +106,46 @@ fun SettingsScreen(
             label = "Éteindre l'écran après le lancement",
             checked = settings.screenOff,
             onCheckedChange = { onChange(settings.copy(screenOff = it)) }
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        Text("Délais", color = ColTeal, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+        Text(
+            "Intervalles de lecture de l'API Tesla. Valeurs : 10–120 s (en ligne), " +
+                    "10–60 s (endormi/erreur). Modifications appliquées au cycle suivant.",
+            color = ColWazeText,
+            fontSize = 12.sp
+        )
+        Text(
+            "⚠️ Réduire fortement ces délais multiplie les appels à l'API Tesla " +
+                    "(risque de limitation) et peut provoquer des arrêts ou relances " +
+                    "intempestifs. Conservez les valeurs par défaut sauf besoin précis.",
+            color = ColWarn,
+            fontSize = 12.sp
+        )
+        DelayRow(
+            label = "Véhicule en ligne",
+            value = settings.pollOnlineSec,
+            max = WazeSettings.MAX_POLL_ONLINE_SEC,
+            onChange = { onChange(settings.copy(pollOnlineSec = it)) }
+        )
+        DelayRow(
+            label = "Véhicule endormi / hors ligne",
+            value = settings.pollAsleepSec,
+            max = WazeSettings.MAX_POLL_ASLEEP_SEC,
+            onChange = { onChange(settings.copy(pollAsleepSec = it)) }
+        )
+        DelayRow(
+            label = "Après une erreur",
+            value = settings.pollErrorSec,
+            max = WazeSettings.MAX_POLL_ERROR_SEC,
+            onChange = { onChange(settings.copy(pollErrorSec = it)) }
+        )
+        Text(
+            "Le délai de confirmation d'arrêt suit l'intervalle « en ligne ».",
+            color = ColWazeText,
+            fontSize = 11.sp
         )
 
         Spacer(Modifier.height(16.dp))
@@ -260,6 +306,25 @@ private fun UrlField(label: String, value: String, onValue: (String) -> Unit) {
         ),
         modifier = Modifier.fillMaxWidth()
     )
+}
+
+@Composable
+private fun DelayRow(label: String, value: Int, max: Int, onChange: (Int) -> Unit) {
+    Column(Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(label, color = ColWazeText, fontSize = 12.sp)
+            Text("$value s", color = ColTeal, fontSize = 12.sp)
+        }
+        Slider(
+            value = value.toFloat(),
+            onValueChange = { onChange(it.roundToInt()) },
+            valueRange = WazeSettings.MIN_POLL_SEC.toFloat()..max.toFloat(),
+            steps = ((max - WazeSettings.MIN_POLL_SEC) / WazeSettings.POLL_STEP_SEC) - 1
+        )
+    }
 }
 
 @Composable
