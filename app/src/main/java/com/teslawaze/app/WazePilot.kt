@@ -63,11 +63,15 @@ class WazePilot(private val stopConfirmations: Int = 2) {
             stoppedKey = null
         }
 
-        if (destination == null) return confirmStop("destination retirée")
+        if (destination == null) {
+            // À l'arrêt, une destination nulle est définitive : inutile d'attendre une
+            // seconde lecture. En roulant, elle peut être un trou de recalcul.
+            return confirmStop("destination retirée", immediate = !moving)
+        }
 
         // Garé **après** avoir roulé : la navigation est terminée.
         if (shiftState == "P" && sawDriving) {
-            return confirmStop("véhicule garé")
+            return confirmStop("véhicule garé", immediate = true)
         }
 
         stopStreak = 0
@@ -89,15 +93,17 @@ class WazePilot(private val stopConfirmations: Int = 2) {
         launchedKey = null
     }
 
-    private fun confirmStop(reason: String): Action {
+    private fun confirmStop(reason: String, immediate: Boolean = false): Action {
         if (launchedKey == null) {
             // Rien à arrêter : l'état affiché reste celui du service (véhicule endormi, pas de
             // destination…).
             stopStreak = 0
             return Action.None
         }
-        stopStreak++
-        if (stopStreak < stopConfirmations) return Action.Idle("Arrêt en cours — $reason")
+        if (!immediate) {
+            stopStreak++
+            if (stopStreak < stopConfirmations) return Action.Idle("Arrêt en cours — $reason")
+        }
         stopStreak = 0
         stoppedKey = launchedKey
         launchedKey = null

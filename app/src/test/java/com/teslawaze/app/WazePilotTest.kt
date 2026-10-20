@@ -43,10 +43,9 @@ class WazePilotTest {
     }
 
     @Test
-    fun `vehicule gare apres avoir roule - arrete`() {
+    fun `vehicule gare apres avoir roule - arret immediat`() {
         val pilot = WazePilot()
         pilot.next(true, aix, "D", 40.0)
-        pilot.next(true, aix, "P", 0.0) // 1re confirmation : pas encore d'arrêt
         assertEquals(WazePilot.Action.Stop::class, pilot.next(true, aix, "P", 0.0)::class)
         assertNull(pilot.launchedKey)
     }
@@ -55,8 +54,7 @@ class WazePilotTest {
     fun `apres arret a l arrivee - ne relance pas la meme destination`() {
         val pilot = WazePilot()
         pilot.next(true, aix, "D", 40.0)
-        pilot.next(true, aix, "P", 0.0)
-        pilot.next(true, aix, "P", 0.0) // → Stop
+        pilot.next(true, aix, "P", 0.0) // → Stop immédiat
         assertEquals(WazePilot.Action.Idle::class, pilot.next(true, aix, "P", 0.0)::class)
     }
 
@@ -64,18 +62,25 @@ class WazePilotTest {
     fun `nouveau depart apres arret - relance`() {
         val pilot = WazePilot()
         pilot.next(true, aix, "D", 40.0)
-        pilot.next(true, aix, "P", 0.0)
-        pilot.next(true, aix, "P", 0.0) // → Stop
+        pilot.next(true, aix, "P", 0.0) // → Stop immédiat
         val action = pilot.next(true, aix, "D", 20.0) // la voiture repart
         assertTrue(action is WazePilot.Action.Launch)
     }
 
     @Test
-    fun `destination retiree - arret confirme en deux lectures`() {
+    fun `destination retiree en roulant - arret confirme en deux lectures`() {
         val pilot = WazePilot()
         pilot.next(true, aix, "D", 40.0)
         assertEquals(WazePilot.Action.Idle::class, pilot.next(true, null, "D", 40.0)::class)
         assertEquals(WazePilot.Action.Stop::class, pilot.next(true, null, "D", 40.0)::class)
+    }
+
+    @Test
+    fun `destination retiree a l arret - arret immediat`() {
+        val pilot = WazePilot()
+        pilot.next(true, aix, "D", 40.0)
+        assertEquals(WazePilot.Action.Stop::class, pilot.next(true, null, "P", 0.0)::class)
+        assertNull(pilot.launchedKey)
     }
 
     @Test
