@@ -107,17 +107,42 @@ class TeslaApi(
             }
             val lat = drive.optDouble("active_route_latitude", Double.NaN)
             val lon = drive.optDouble("active_route_longitude", Double.NaN)
-            if (lat.isNaN() || lon.isNaN()) return@withContext DriveState(null, shift, speed)
+            if (!lat.isFinite() || !lon.isFinite()) {
+                return@withContext DriveState(null, shift, speed)
+            }
+
+            val name = drive.optString("active_route_destination")
+                .takeIf { it.isNotBlank() && it != "null" }
+            val minutes = if (drive.isNull("active_route_minutes_to_arrival")) null
+            else drive.optDouble("active_route_minutes_to_arrival", Double.NaN)
+                .takeUnless { it.isNaN() }
+            val miles = if (drive.isNull("active_route_miles_to_arrival")) null
+            else drive.optDouble("active_route_miles_to_arrival", Double.NaN)
+                .takeUnless { it.isNaN() }
+            val carLat = if (drive.isNull("latitude")) null
+            else drive.optDouble("latitude", Double.NaN).takeUnless { it.isNaN() }
+            val carLon = if (drive.isNull("longitude")) null
+            else drive.optDouble("longitude", Double.NaN).takeUnless { it.isNaN() }
+
+            android.util.Log.d(
+                "TeslaWaze",
+                "tesla: dest name=$name lat=$lat lon=$lon min=$minutes mi=$miles " +
+                        "car=$carLat,$carLon shift=$shift"
+            )
+
+            // Certains firmwares renvoient une destination factice quand la navigation est
+            // inactive (« Tesla », coordonnées nulles ou égales à la position du véhicule).
+            if (isPlaceholderDestination(name, lat, lon, minutes, miles, carLat, carLon)) {
+                android.util.Log.d("TeslaWaze", "tesla: destination factice ignorée")
+                return@withContext DriveState(null, shift, speed)
+            }
 
             DriveState(
                 destination = Destination(
                     lat = lat,
                     lon = lon,
-                    name = drive.optString("active_route_destination")
-                        .takeIf { it.isNotBlank() && it != "null" },
-                    minutesToArrival = if (drive.isNull("active_route_minutes_to_arrival")) null
-                    else drive.optDouble("active_route_minutes_to_arrival", Double.NaN)
-                        .takeUnless { it.isNaN() }
+                    name = name,
+                    minutesToArrival = minutes
                 ),
                 shiftState = shift,
                 speedMph = speed
@@ -145,4 +170,34 @@ class TeslaApi(
         if (code !in 200..299) throw TeslaApiException(code, body.take(300))
         JSONObject(body)
     }
+}
+
+/**
+ * Détecte une destination factice renvoyée par certains firmwares lorsque la navigation est
+ * inactive : coordonnées (0, 0) ou non finies, nom « Tesla » sans ETA, ou destination sans nom
+ * et sans ETA (l'API conserve alors les coordonnées du dernier trajet). Sans ce filtre, Waze
+ * resterait lancé après l'arrivée.
+ */
+internal fun isPlaceholderDestination(
+    name: String?,
+    lat: Double,
+    lon: Double,
+    minutesToArrival: Double?,
+    milesToArrival: Double?,
+    carLat: Double?,
+    carLon: Double?
+): Boolean {
+    if (!lat.isFinite() || !lon.isFinite()) return true
+    if (lat == 0.0 && lon == 0.0) return true
+
+    val noEta = (minutesToArrival ?: 0.0) <= 0.0 && (milesToArrival ?: 0.0) <= 0.0
+    val carAtDestination = carLat != null && carLon != null &&
+            kotlin.math.abs(lat - carLat) < 0.0005 &&
+            kotlin.math.abs(lon - carLon) < 0.0007
+    val placeholderName = name?.trim()?.equals("Tesla", ignoreCase = true) == true
+
+    // Après l'arrêt de la navigation, l'API renvoie souvent les coordonnées du dernier trajet
+    // avec un nom vide et aucune ETA : ce n'est plus une destination.
+    return (name == null && noEta) ||
+            (placeholderName && (noEta || carAtDestination))
 }
