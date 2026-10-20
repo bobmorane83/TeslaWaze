@@ -15,7 +15,7 @@ d'annoncer les événements. Quand le trajet est terminé, Waze se referme.
 ## Téléchargement
 
 📦 **[Télécharger la dernière version (APK)](https://github.com/bobmorane83/TeslaWaze/releases/latest)**
-— version **0.1.0**, APK de développement à installer manuellement.
+— version **0.1.1**, APK de développement à installer manuellement.
 
 > 📘 **Guide d'utilisation complet (première installation pas à pas) :
 > [Guide.md](Guide.md)**

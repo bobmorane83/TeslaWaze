@@ -22,8 +22,8 @@ android {
         applicationId = "com.teslawaze.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.1.1"
 
         buildConfigField("String", "TESLA_CLIENT_ID", "\"${secret("TESLA_CLIENT_ID")}\"")
         buildConfigField("String", "TESLA_REDIRECT_URI", "\"${secret("TESLA_REDIRECT_URI", "com.teslawaze.app://oauth")}\"")

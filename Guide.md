@@ -1,6 +1,6 @@
 # Guide d'utilisation de TeslaWaze
 
-> Version 0.1.0 — Android 8.0 ou plus récent
+> Version 0.1.1 — Android 8.0 ou plus récent
 
 TeslaWaze fait une chose simple : il lance **Waze en arrière-plan** pour vous prévenir des
 **événements signalés par la communauté** (police, danger, bouchon…). **Le guidage reste celui
@@ -315,4 +315,4 @@ Pour un diagnostic approfondi, voir le [guide technique](Guide-Technique.md).
 
 ---
 
-*Guide utilisateur de la version 0.1.0.*
+*Guide utilisateur de la version 0.1.1.*

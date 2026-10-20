@@ -1,6 +1,6 @@
 # Guide technique de TeslaWaze
 
-> Version 0.1.0 — documentation du fonctionnement interne
+> Version 0.1.1 — documentation du fonctionnement interne
 
 Ce document décrit l'architecture, les mécanismes et la compilation de TeslaWaze. Pour
 l'utilisation pas à pas, voir le [guide utilisateur](Guide.md).
@@ -327,5 +327,5 @@ Principaux messages : décisions de la machine à états, appels Tesla, lancemen
 
 ---
 
-*Guide technique de la version 0.1.0 — voir aussi le [guide utilisateur](Guide.md) et le
+*Guide technique de la version 0.1.1 — voir aussi le [guide utilisateur](Guide.md) et le
 [README](README.md).*
