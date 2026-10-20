@@ -68,6 +68,11 @@ téléphone.
 | Données de conduite | `GET /api/1/vehicles/{id}/vehicle_data?endpoints=drive_state` — **réveille** | **60 s**, uniquement si `online` |
 | Erreur réseau / jeton | nouvel essai | **30 s** |
 
+Les trois intervalles (en ligne, endormi, erreur) sont **réglables** dans
+**Réglages → Délais** (en ligne 10–120 s, endormi/erreur 10–60 s). Toute modification
+s'applique au cycle suivant, sans redémarrer le service. Des valeurs trop courtes multiplient
+les appels à l'API et peuvent provoquer des arrêts/relances intempestifs.
+
 La destination et l'état de conduite sont lus dans `drive_state` :
 `active_route_latitude`, `active_route_longitude`, `active_route_destination`,
 `active_route_minutes_to_arrival`, `shift_state`, `speed`.
@@ -94,19 +99,22 @@ unitairement).
 | Destination présente, véhicule non garé (ou garé **avant** tout départ) | **Lancer** Waze |
 | Même destination qu'au lancement | Ne rien faire |
 | Destination différente | **Relancer** Waze |
-| Destination retirée | **Arrêter** après confirmation |
-| Véhicule garé (`P`) **après avoir roulé** | **Arrêter** après confirmation |
+| Destination retirée | **Arrêter** (immédiat à l'arrêt, confirmé en roulant) |
+| Véhicule garé (`P`) **après avoir roulé** | **Arrêter immédiatement** |
 | Véhicule hors ligne / endormi | **Arrêter** après confirmation |
 | Destination déjà arrêtée | Ne pas relancer tant que le véhicule ne repart pas |
 
 Détails :
 
-- **Deux lectures concordantes** (`STOP_CONFIRMATIONS = 2`) sont exigées avant tout arrêt :
-  `active_route_*` devient brièvement nul pendant un recalcul, et un véhicule peut passer
-  `offline` quelques secondes.
+- **Deux lectures concordantes** (`STOP_CONFIRMATIONS = 2`) sont exigées **en roulant** avant
+  tout arrêt : `active_route_*` devient brièvement nul pendant un recalcul. **À l'arrêt**
+  (véhicule non en mouvement), l'arrêt est immédiat.
 - Le véhicule est « en mouvement » si `shift_state` vaut `D`, `R` ou `N`, ou si la vitesse
   dépasse 0,5 mph. Rouler réarme l'arrêt et autorise une nouvelle relance.
 - La clé de destination est arrondie à ~1 m (`%.5f,%.5f`), ce qui évite les relances inutiles.
+- **Destinations factices ignorées** : certains firmwares renvoient « Tesla », des coordonnées
+  nulles ou la position du véhicule sans ETA lorsque la navigation est inactive. Ces valeurs
+  sont traitées comme « pas de destination » (sinon Waze ne s'arrêterait jamais).
 
 ---
 
@@ -136,7 +144,9 @@ Trois leviers, dans cet ordre :
 
 1. **Action « Éteindre » de la notification Waze** — via `WazeNotificationListener`, qui parcourt
    les notifications actives de `com.waze` et déclenche l'action dont le titre correspond à
-   `Éteindre`, `Fermer`, `Arrêter`, `Turn off`, `Close`, etc. Aucun contenu n'est lu.
+   `Éteindre`, `Fermer`, `Arrêter`, `Turn off`, `Close`, etc. Aucun contenu n'est lu. Si Waze
+   publie encore une notification **1,5 s** après l'envoi, l'app passe au levier suivant
+   (fermeture forcée).
 2. **Prise du premier plan** — `StopWazeActivity` (écran noir, aucune vue) reste visible ~500 ms
    par essai, jusqu'à 8 essais (~4 s) : Waze passe en arrière-plan et publie sa notification,
    que l'on peut éteindre. Exige `SYSTEM_ALERT_WINDOW`.
@@ -306,7 +316,8 @@ Principaux messages : décisions de la machine à états, appels Tesla, lancemen
 
 - **Fermeture non officielle** : dépend de l'action de notification de Waze et d'une prise de
   premier plan ; une mise à jour de Waze peut modifier ces éléments.
-- **Délai d'arrêt** : deux lectures concordantes ⇒ 1 à 2 minutes.
+- **Délai d'arrêt** : immédiat à l'arrêt (lecture suivante) ; en roulant, deux lectures
+  concordantes (jusqu'à 2 minutes).
 - **API Tesla** : jetons révocables, limitation de débit, évolutions possibles.
 - **Services de premier plan** : certains constructeurs les tuent malgré tout ; voir la section
   fiabilité du guide utilisateur.

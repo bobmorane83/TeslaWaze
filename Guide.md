@@ -72,7 +72,7 @@ TeslaWaze n'est pas disponible sur le Play Store. Il s'installe à partir d'un f
 ## 4. Première utilisation (une seule fois)
 
 Suivez les étapes dans l'ordre. Si vous fermez une demande avec « Plus tard », vous pourrez la
-retrouver plus tard en touchant l'écran principal de l'application.
+retrouver plus tard en touchant l'engrenage en haut à droite de l'application.
 
 ### 4.1 Ouvrir l'application
 
@@ -120,7 +120,7 @@ la première est la plus simple.
 
 #### Méthode 1 — connexion guidée par l'application (recommandée)
 
-1. Toucher l'écran principal pour ouvrir les réglages.
+1. Toucher l'**engrenage** en haut à droite pour ouvrir les réglages.
 2. Toucher **Se connecter**.
 3. Se connecter avec votre compte Tesla sur la page qui s'ouvre.
 
@@ -136,7 +136,7 @@ Un **jeton** est un code d'accès temporaire généré par un outil de connexion
 1. Générez un jeton avec un outil reconnu :
    - **tesla_auth** (utilisé par TeslaMate) ;
    - ou l'application mobile **Auth app for Tesla**.
-2. Dans TeslaWaze, toucher l'écran principal pour ouvrir les réglages.
+2. Dans TeslaWaze, toucher l'**engrenage** en haut à droite pour ouvrir les réglages.
 3. Toucher **Coller un token**.
 4. Coller les deux codes fournis par l'outil, puis **Enregistrer**.
 
@@ -150,7 +150,7 @@ Pour les cas particuliers (application Tesla personnelle, réglages avancés), v
 Il arrive que TeslaWaze ne puisse pas retrouver votre voiture tout seul. L'application affiche
 alors « ID véhicule manquant ».
 
-1. Toucher l'écran principal → **Avancé**.
+1. Toucher l'**engrenage** en haut à droite → **Avancé**.
 2. Renseigner l'**ID véhicule** : un numéro fourni par votre compte Tesla ou par l'outil qui a
    servi à vous connecter.
 3. Fermer les réglages : la valeur est enregistrée automatiquement.
@@ -197,7 +197,7 @@ Certains téléphones (Xiaomi, Samsung, Huawei, Oppo…) arrêtent les applicati
    Le guidage reste celui de la Tesla.
 5. Vérifier que le volume des alertes est audible (volume multimédia / Bluetooth).
 6. Arrêter la navigation, ou garer le véhicule (`P`).
-7. Sous **1 à 2 minutes**, Waze doit se fermer.
+7. **À l'arrêt**, Waze doit se fermer dès la lecture suivante (au plus ~1 minute).
 
 ### 4.11 Récapitulatif
 
@@ -224,9 +224,9 @@ Certains téléphones (Xiaomi, Samsung, Huawei, Oppo…) arrêtent les applicati
 4. **Régler le son** : les alertes utilisent le volume multimédia du téléphone (ou le Bluetooth).
    Si l'extinction d'écran est désactivée, appuyer sur **Accueil** pour mettre Waze en
    arrière-plan sans le fermer.
-5. **À l'arrivée** : garer le véhicule en `P`, ou effacer la navigation. Waze se ferme au bout
-   de 1 à 2 minutes.
-6. **Toucher l'écran principal** ouvre les réglages ; **« Quitter »** arrête la surveillance
+5. **À l'arrivée** : garer le véhicule en `P`, ou effacer la navigation. Waze se ferme dès
+   la lecture suivante (au plus ~1 minute) si le véhicule est arrêté.
+6. **Toucher l'engrenage** en haut à droite ouvre les réglages ; **« Quitter »** arrête la surveillance
    jusqu'à la prochaine ouverture de l'application.
 
 La notification permanente (logo **T**) indique ce que fait l'application et propose
@@ -236,18 +236,24 @@ La notification permanente (logo **T**) indique ce que fait l'application et pro
 
 ## 6. Les réglages
 
-Toucher l'écran principal ouvre les réglages.
+Toucher l'**engrenage** en haut à droite ouvre les réglages.
 
 | Réglage | À quoi il sert |
 |---|---|
 | **Superposer** | indique si l'autorisation nécessaire est accordée ; bouton pour la demander |
 | **Accès aux notifications** | idem pour l'autorisation qui permet de fermer Waze |
 | **Éteindre l'écran après le lancement** | verrouille l'écran après l'ouverture de Waze (défaut : activé) |
+| **Délais** | intervalles de lecture de l'API Tesla (en ligne 10–120 s, endormi/erreur 10–60 s ; défauts 60 / 30 / 30 s) |
 | **Compte Tesla** | état de la connexion, boutons **Se connecter**, **Coller un token**, **Se déconnecter** |
 | **Avancé** | réglages réservés : ne pas modifier sans consigne (identification du véhicule, cas particuliers) |
 
 En usage normal, seuls la connexion Tesla et l'option d'écran sont à toucher. Les champs
 « Avancé » ne servent qu'en cas de besoin particulier.
+
+Les trois **délais** se règlent par curseurs (en ligne : 10 à 120 s ; endormi/erreur : 10 à
+60 s). **Les réduire fortement multiplie les appels à l'API Tesla (risque de limitation) et
+peut provoquer des arrêts ou relances intempestifs.** L'intervalle « en ligne » sert aussi de
+délai de confirmation d'arrêt : plus il est court, plus Waze se ferme vite.
 
 ---
 
@@ -262,7 +268,7 @@ En usage normal, seuls la connexion Tesla et l'option d'écran sont à toucher. 
 | `Véhicule endormi/offline — en attente` | la voiture ne répond pas | normal ; ouvrir l'application Tesla pour la réveiller |
 | `En ligne — pas de destination de navigation` | aucune navigation en cours | programmer une destination |
 | `Navigation vers …` | Waze a été lancé | rien |
-| `Arrêt en cours — …` | vérification avant fermeture | attendre 1 à 2 minutes |
+| `Arrêt en cours — …` | vérification avant fermeture (véhicule en mouvement) | attendre la lecture suivante |
 | `Véhicule arrêté — en attente d'un nouveau départ` | trajet terminé | repartir pour relancer Waze |
 | `Waze arrêté (destination retirée / véhicule garé / véhicule hors ligne)` | fermeture normale | rien |
 | `Arrêt de Waze impossible — autorisations manquantes` | une autorisation manque | accorder « Superposer » et l'accès aux notifications |
@@ -276,7 +282,7 @@ En usage normal, seuls la connexion Tesla et l'option d'écran sont à toucher. 
 | Problème | Solution |
 |---|---|
 | Waze ne s'ouvre pas | vérifier que l'application affiche « Waze installé — surveillance active » ; accorder « Superposer » ; vérifier l'ID véhicule ; réveiller la voiture dans l'application Tesla |
-| Waze ne se ferme pas | accorder l'accès aux notifications ; accorder « Superposer » ; attendre 1 à 2 minutes |
+| Waze ne se ferme pas | accorder l'accès aux notifications ; accorder « Superposer » ; attendre jusqu'à 1 minute |
 | Waze parle en même temps que la Tesla | couper le guidage vocal dans Waze (§4.8) |
 | Aucune alerte audible | activer les alertes dans Waze ; augmenter le volume multimédia ; vérifier le Bluetooth |
 | La surveillance s'arrête seule | mettre TeslaWaze en batterie « Non restreinte » et autoriser le démarrage automatique |
@@ -292,7 +298,8 @@ Pour un diagnostic approfondi, voir le [guide technique](Guide-Technique.md).
 - Android **8.0** minimum ; pas de version iOS.
 - TeslaWaze n'est **pas sur le Play Store** : l'installation se fait par APK.
 - Waze doit avoir une destination active pour connaître le trajet et annoncer les événements.
-- La fermeture de Waze prend **1 à 2 minutes** (deux vérifications sont nécessaires).
+- La fermeture est **immédiate à l'arrêt** ; en roulant, deux vérifications (jusqu'à 2 min)
+  évitent un faux arrêt.
 - Les alertes dépendent du **volume multimédia** et de la sortie audio du téléphone.
 - Une mise à jour de Waze peut modifier la façon dont il se ferme.
 - Aucune permission de localisation n'est demandée : Waze gère le GPS.
