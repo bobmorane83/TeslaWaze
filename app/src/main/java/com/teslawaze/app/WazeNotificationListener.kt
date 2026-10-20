@@ -44,6 +44,17 @@ class WazeNotificationListener : NotificationListenerService() {
 
         val isConnected: Boolean get() = instance != null
 
+        /** `true` si Waze publie encore une notification ; `null` si l'écoute n'est pas connectée. */
+        fun isWazeRunning(): Boolean? {
+            val svc = instance ?: return null
+            return try {
+                svc.activeNotifications?.any { it.packageName == WazeLauncher.PACKAGE } ?: false
+            } catch (e: Exception) {
+                Log.w(TAG, "notif-listener: activeNotifications KO: ${e.message}")
+                null
+            }
+        }
+
         /**
          * Déclenche l'action « Éteindre » de la notification de Waze.
          * `false` si l'accès aux notifications n'est pas accordé ou si Waze ne publie rien.

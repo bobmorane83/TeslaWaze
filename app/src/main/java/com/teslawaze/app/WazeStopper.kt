@@ -2,6 +2,8 @@ package com.teslawaze.app
 
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.app.ActivityManager
 
@@ -22,6 +24,9 @@ import android.app.ActivityManager
 object WazeStopper {
 
     private const val TAG = "TeslaWaze"
+
+    /** Délai avant de vérifier si Waze a réellement disparu après « Éteindre ». */
+    private const val FOLLOW_UP_MS = 1_500L
 
     /** Tue le processus Waze s'il est déjà en arrière-plan. `false` si le système refuse. */
     fun killNow(context: Context): Boolean {
@@ -49,7 +54,17 @@ object WazeStopper {
         if (!WazeLauncher.isInstalled(context)) return true
 
         if (WazeNotificationListener.closeWaze()) {
-            Log.d(TAG, "waze: arrêté via l'action « Éteindre »")
+            Log.d(TAG, "waze: action « Éteindre » envoyée")
+            // Si Waze met du temps à se fermer, on force la fermeture peu après.
+            killNow(context)
+            Handler(Looper.getMainLooper()).postDelayed({
+                val running = WazeNotificationListener.isWazeRunning()
+                Log.d(TAG, "waze: état après « Éteindre » = $running")
+                if (running == true) {
+                    Log.d(TAG, "waze: encore actif — fermeture forcée")
+                    forceForeground(context)
+                }
+            }, FOLLOW_UP_MS)
             return true
         }
 
@@ -67,6 +82,23 @@ object WazeStopper {
             Log.w(TAG, "waze: lancement StopWazeActivity impossible: ${e.message}")
             killNow(context)
             false
+        }
+    }
+
+    /** Prend brièvement le premier plan pour rendre `killBackgroundProcesses` effectif. */
+    private fun forceForeground(context: Context) {
+        if (!Permissions.canDrawOverlays(context)) {
+            killNow(context)
+            return
+        }
+        try {
+            context.startActivity(
+                Intent(context, StopWazeActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+            )
+        } catch (e: Exception) {
+            Log.w(TAG, "waze: lancement StopWazeActivity impossible: ${e.message}")
+            killNow(context)
         }
     }
 }
