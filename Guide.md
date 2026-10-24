@@ -191,7 +191,7 @@ Certains téléphones (Xiaomi, Samsung, Huawei, Oppo…) arrêtent les applicati
 
 1. Toucher l'**indicateur en haut à gauche** : il doit être **turquoise**. Un appui affiche
    la liste des prérequis et leur état ; en orange, l'un d'eux manque (Waze non installé,
-   autorisation refusée, compte Tesla non connecté…).
+   autorisation refusée, compte Tesla non connecté, ID véhicule absent…).
 2. Vérifier que le **guidage vocal de Waze est coupé** (§4.8).
 3. Lancer une navigation dans la Tesla.
 4. Sous **60 secondes**, Waze doit s'ouvrir (et l'écran se verrouiller si l'option est active).

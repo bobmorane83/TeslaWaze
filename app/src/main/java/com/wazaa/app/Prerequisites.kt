@@ -16,6 +16,7 @@ internal data class Prerequisite(
 /** Construit la liste affichée par l'indicateur d'état (sans dépendance Android, donc testable). */
 internal fun evaluatePrerequisites(
     teslaConnected: Boolean,
+    vehicleIdKnown: Boolean,
     overlayGranted: Boolean,
     notificationsGranted: Boolean,
     notificationAccessGranted: Boolean,
@@ -29,6 +30,14 @@ internal fun evaluatePrerequisites(
             label = "Compte Tesla",
             detail = if (teslaConnected) "Connecté" else "Non connecté — reconnecte-toi",
             ok = teslaConnected
+        )
+    )
+    add(
+        Prerequisite(
+            label = "Véhicule",
+            detail = if (vehicleIdKnown) "Identifié"
+            else "ID manquant — Réglages → Avancé",
+            ok = vehicleIdKnown
         )
     )
     add(

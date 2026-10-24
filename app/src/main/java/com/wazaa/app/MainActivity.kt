@@ -240,6 +240,7 @@ private fun WazeScreen() {
         prereqRefresh,
         settings,
         running,
+        status,
         teslaStatus,
         overlayNeeded,
         notifAccessNeeded,
@@ -247,6 +248,7 @@ private fun WazeScreen() {
     ) {
         evaluatePrerequisites(
             teslaConnected = token != null && (!token.isExpiring() || token.refresh != null),
+            vehicleIdKnown = session.vehicleId() != null,
             overlayGranted = Permissions.canDrawOverlays(context),
             notificationsGranted = notifGranted,
             notificationAccessGranted = Permissions.hasNotificationAccess(context),

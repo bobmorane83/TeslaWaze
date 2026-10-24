@@ -10,6 +10,7 @@ class PrerequisitesTest {
 
     private fun evaluate(
         teslaConnected: Boolean = true,
+        vehicleIdKnown: Boolean = true,
         overlayGranted: Boolean = true,
         notificationsGranted: Boolean = true,
         notificationAccessGranted: Boolean = true,
@@ -19,6 +20,7 @@ class PrerequisitesTest {
         screenOffAdminGranted: Boolean = false
     ) = evaluatePrerequisites(
         teslaConnected = teslaConnected,
+        vehicleIdKnown = vehicleIdKnown,
         overlayGranted = overlayGranted,
         notificationsGranted = notificationsGranted,
         notificationAccessGranted = notificationAccessGranted,
@@ -38,6 +40,13 @@ class PrerequisitesTest {
     @Test
     fun `une autorisation manquante - indicateur orange`() {
         val list = evaluate(overlayGranted = false)
+        assertFalse(list.allSatisfied())
+        assertEquals(1, list.missingCount())
+    }
+
+    @Test
+    fun `ID vehicule manquant - indicateur orange`() {
+        val list = evaluate(vehicleIdKnown = false)
         assertFalse(list.allSatisfied())
         assertEquals(1, list.missingCount())
     }
