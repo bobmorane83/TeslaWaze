@@ -85,7 +85,8 @@ Principes :
 - `vehicle_data` n'est appelé **que si la sonde répond `online`**, une fois par cycle ;
 - si l'ID véhicule est inconnu, Wazaa tente `GET /api/1/products` avec un jeton historique
   (le même endpoint que TeslaMate) et `GET /api/1/vehicles` avec un jeton Fleet API ;
-- si la découverte échoue malgré tout, l'ID peut être saisi dans les réglages.
+- si la découverte échoue malgré tout, la section « Avancé » reste dans le code mais n'est
+  plus exposée dans l'interface.
 
 Le client est `TeslaApi` : `HttpURLConnection` + `org.json`, aucun client HTTP externe. Les
 appels sont `suspend` et s'exécutent sur `Dispatchers.IO`.

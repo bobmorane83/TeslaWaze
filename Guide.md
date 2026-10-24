@@ -142,18 +142,14 @@ Un **jeton** est un code d'accès temporaire généré par un outil de connexion
 
 Votre connexion reste sur votre téléphone et n'est jamais partagée avec un autre service.
 
-Pour les cas particuliers (application Tesla personnelle, réglages avancés), voir le
+Pour les cas particuliers (application Tesla personnelle), voir le
 [guide technique](Guide-Technique.md#9-connexion-sécurité-et-stockage).
 
-### 4.6 Si l'application le demande : identifier votre véhicule
+### 4.6 Identification du véhicule
 
-Il arrive que Wazaa ne puisse pas retrouver votre voiture tout seul. L'application affiche
-alors « ID véhicule manquant ».
-
-1. Toucher l'**engrenage** en haut à droite → **Avancé**.
-2. Renseigner l'**ID véhicule** : un numéro fourni par votre compte Tesla ou par l'outil qui a
-   servi à vous connecter.
-3. Fermer les réglages : la valeur est enregistrée automatiquement.
+Wazaa identifie automatiquement votre voiture après la connexion Tesla. Si l'indicateur
+signale « ID véhicule manquant », vérifier que le compte Tesla est toujours connecté, puis
+rouvrir Wazaa. La section « Avancé » n'est pas exposée dans l'interface.
 
 ### 4.7 Autoriser le verrouillage de l'écran (optionnel)
 
@@ -207,7 +203,6 @@ Certains téléphones (Xiaomi, Samsung, Huawei, Oppo…) arrêtent les applicati
 - [ ] Autoriser « Afficher par-dessus les autres applications »
 - [ ] Autoriser l'accès aux notifications
 - [ ] Connecter le compte Tesla (connexion guidée, ou jeton collé)
-- [ ] Renseigner l'ID véhicule si l'application le demande
 - [ ] Autoriser le verrouillage de l'écran (si extinction d'écran souhaitée)
 - [ ] Configurer Waze : guidage vocal coupé, alertes actives
 - [ ] Désactiver l'optimisation de batterie pour Wazaa
@@ -250,15 +245,14 @@ Toucher l'**engrenage** en haut à droite ouvre les réglages.
 | **Relancer Waze toutes les 15 s s'il n'est plus actif** | vérifie que la navigation Waze tourne encore ; si Waze a été fermé, renvoie la destination Tesla (défaut : désactivé) |
 | **Délais** | intervalles de lecture de l'API Tesla (en ligne 10–120 s, endormi/erreur 10–60 s ; défauts 60 / 30 / 30 s) |
 | **Compte Tesla** | état de la connexion, boutons **Se connecter**, **Coller un token**, **Se déconnecter** |
-| **Avancé** | réglages réservés : ne pas modifier sans consigne (identification du véhicule, cas particuliers) |
 
 Le **watchdog Waze** n'agit que lorsqu'une **destination Tesla est active**. Sans destination
 dans la voiture, il ne lance rien. Waze ne permet pas de lire sa destination interne : le
 watchdog vérifie que sa notification de navigation est toujours présente, et renvoie la
 destination Tesla si Waze a été fermé.
 
-En usage normal, seuls la connexion Tesla et l'option d'écran sont à toucher. Les champs
-« Avancé » ne servent qu'en cas de besoin particulier.
+En usage normal, seuls la connexion Tesla et l'option d'écran sont à toucher. Les réglages
+techniques internes ne sont pas exposés dans l'interface.
 
 Les trois **délais** se règlent par curseurs (en ligne : 10 à 120 s ; endormi/erreur : 10 à
 60 s). **Les réduire fortement multiplie les appels à l'API Tesla (risque de limitation) et
@@ -274,7 +268,7 @@ délai de confirmation d'arrêt : plus il est court, plus Waze se ferme vite.
 | `Connexion Tesla requise` | aucun jeton n'est enregistré | connecter le compte Tesla (§4.5) |
 | `Connecté — expire dans N h` | tout va bien | rien |
 | `Connexion Tesla expirée — rouvrez l'app` | l'accès a été révoqué | reconnecter le compte |
-| `ID véhicule manquant (Réglages → Avancé)` | le véhicule n'a pas pu être identifié | renseigner l'ID véhicule (§4.6) |
+| `ID véhicule manquant` | le véhicule n'a pas pu être identifié | vérifier la connexion Tesla, puis rouvrir Wazaa (§4.6) |
 | `Véhicule endormi/offline — en attente` | la voiture ne répond pas | normal ; ouvrir l'application Tesla pour la réveiller |
 | `En ligne — pas de destination de navigation` | aucune navigation en cours | programmer une destination |
 | `Navigation vers …` | Waze a été lancé | rien |
@@ -290,7 +284,7 @@ délai de confirmation d'arrêt : plus il est court, plus Waze se ferme vite.
 
 | Problème | Solution |
 |---|---|
-| Waze ne s'ouvre pas | toucher l'indicateur en haut à gauche : il doit être turquoise. S'il est orange, accorder l'autorisation signalée ; vérifier l'ID véhicule ; réveiller la voiture dans l'application Tesla |
+| Waze ne s'ouvre pas | toucher l'indicateur en haut à gauche : il doit être turquoise. S'il est orange, accorder l'autorisation signalée ; vérifier que le compte Tesla est connecté ; réveiller la voiture dans l'application Tesla |
 | Waze ne se ferme pas | accorder l'accès aux notifications ; accorder « Superposer » ; attendre jusqu'à 1 minute |
 | Waze parle en même temps que la Tesla | couper le guidage vocal dans Waze (§4.8) |
 | Aucune alerte audible | activer les alertes dans Waze ; augmenter le volume multimédia ; vérifier le Bluetooth |

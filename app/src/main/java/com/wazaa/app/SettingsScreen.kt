@@ -1,7 +1,6 @@
 package com.wazaa.app
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,7 +38,7 @@ import kotlin.math.roundToInt
 private val ColWarn = Color(0xFFFFB74D)
 
 /**
- * Réglages : comportement Waze, compte Tesla (connexion à la demande), URL avancées.
+ * Réglages : comportement Waze et compte Tesla (connexion à la demande).
  * Ouvert par l'**engrenage** en haut à droite.
  */
 @Composable
@@ -57,7 +56,6 @@ fun SettingsScreen(
     onClose: () -> Unit
 ) {
     var pasteDialog by remember { mutableStateOf(false) }
-    var advanced by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -183,49 +181,8 @@ fun SettingsScreen(
             Text("Se déconnecter", color = ColWazeText, fontSize = 14.sp)
         }
 
-        Spacer(Modifier.height(16.dp))
-
-        // Replié par défaut : ces URL ne servent qu'en cas de besoin particulier.
-        Row(
-            modifier = Modifier.fillMaxWidth().clickable { advanced = !advanced },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "Avancé",
-                color = ColTeal,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.weight(1f)
-            )
-            Text(if (advanced) "▴" else "▾", color = ColTeal, fontSize = 13.sp)
-        }
-        if (advanced) {
-            UrlField(
-                label = "API Tesla",
-                value = settings.teslaApiBase,
-                onValue = { onChange(settings.copy(teslaApiBase = it)) }
-            )
-            UrlField(
-                label = "Authentification Tesla",
-                value = settings.teslaAuthBase,
-                onValue = { onChange(settings.copy(teslaAuthBase = it)) }
-            )
-            UrlField(
-                label = "client_id Fleet API (facultatif)",
-                value = settings.teslaClientId,
-                onValue = { onChange(settings.copy(teslaClientId = it)) }
-            )
-            UrlField(
-                label = "URI de redirection déclarée",
-                value = settings.teslaRedirectUri,
-                onValue = { onChange(settings.copy(teslaRedirectUri = it)) }
-            )
-            UrlField(
-                label = "ID véhicule (eid)",
-                value = if (settings.teslaVehicleId > 0) settings.teslaVehicleId.toString() else "",
-                onValue = { onChange(settings.copy(teslaVehicleId = it.trim().toLongOrNull() ?: 0L)) }
-            )
-        }
+        // La section « Avancé » est volontairement masquée. Les champs restent dans
+        // WazeSettings et UrlField, mais ne sont plus accessibles depuis l'interface.
 
         Spacer(Modifier.height(20.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
