@@ -189,8 +189,9 @@ Certains téléphones (Xiaomi, Samsung, Huawei, Oppo…) arrêtent les applicati
 
 ### 4.10 Tester
 
-1. Vérifier que Waze est installé et que l'application affiche « Waze installé — surveillance
-   active ».
+1. Toucher l'**indicateur en haut à gauche** : il doit être **turquoise**. Un appui affiche
+   la liste des prérequis et leur état ; en orange, l'un d'eux manque (Waze non installé,
+   autorisation refusée, compte Tesla non connecté…).
 2. Vérifier que le **guidage vocal de Waze est coupé** (§4.8).
 3. Lancer une navigation dans la Tesla.
 4. Sous **60 secondes**, Waze doit s'ouvrir (et l'écran se verrouiller si l'option est active).
@@ -229,6 +230,8 @@ Certains téléphones (Xiaomi, Samsung, Huawei, Oppo…) arrêtent les applicati
 6. **Toucher l'engrenage** en haut à droite ouvre les réglages ; **« Quitter »** arrête la surveillance
    jusqu'à la prochaine ouverture de l'application. Si TeslaWaze avait lancé Waze, il le ferme
    également.
+7. **Toucher le point en haut à gauche** affiche l'état de tous les prérequis. Turquoise : tout
+   fonctionne ; orange : une condition manque (le détail indique laquelle).
 
 La notification permanente (logo **T**) indique ce que fait l'application et propose
 « Ouvrir » et « Quitter ».
@@ -280,7 +283,6 @@ délai de confirmation d'arrêt : plus il est court, plus Waze se ferme vite.
 | `Waze arrêté (destination retirée / véhicule garé / véhicule hors ligne)` | fermeture normale | rien |
 | `Arrêt de Waze impossible — autorisations manquantes` | une autorisation manque | accorder « Superposer » et l'accès aux notifications |
 | `Waze introuvable` | Waze n'est pas installé | installer Waze |
-| `Tesla : …` | problème réseau ou service Tesla | vérifier la connexion Internet, réessayer |
 
 ---
 
@@ -288,7 +290,7 @@ délai de confirmation d'arrêt : plus il est court, plus Waze se ferme vite.
 
 | Problème | Solution |
 |---|---|
-| Waze ne s'ouvre pas | vérifier que l'application affiche « Waze installé — surveillance active » ; accorder « Superposer » ; vérifier l'ID véhicule ; réveiller la voiture dans l'application Tesla |
+| Waze ne s'ouvre pas | toucher l'indicateur en haut à gauche : il doit être turquoise. S'il est orange, accorder l'autorisation signalée ; vérifier l'ID véhicule ; réveiller la voiture dans l'application Tesla |
 | Waze ne se ferme pas | accorder l'accès aux notifications ; accorder « Superposer » ; attendre jusqu'à 1 minute |
 | Waze parle en même temps que la Tesla | couper le guidage vocal dans Waze (§4.8) |
 | Aucune alerte audible | activer les alertes dans Waze ; augmenter le volume multimédia ; vérifier le Bluetooth |

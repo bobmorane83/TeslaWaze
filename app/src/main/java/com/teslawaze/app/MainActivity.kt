@@ -9,14 +9,18 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
@@ -36,6 +40,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -54,6 +60,9 @@ internal val ColTeal = Color(0xFF00E5C8)
 internal val ColTealDim = Color(0xFF005A50)
 internal val ColWhite = Color(0xFFFFFFFF)
 internal val ColWazeText = Color(0xFFE8F4F2)
+
+/** Orange de la charte, utilisé quand un prérequis manque. */
+internal val ColOrange = Color(0xFFFFB74D)
 
 /** Fond des boîtes de dialogue : sans lui, le thème clair de Material rend les textes blancs illisibles. */
 internal val ColDialog = Color(0xFF0C1A1F)
@@ -96,14 +105,18 @@ private fun WazeScreen() {
     val running by WatcherState.running.collectAsState()
     var teslaStatus by remember { mutableStateOf(session.statusLabel()) }
     var showSettings by remember { mutableStateOf(false) }
+    var showPrereqs by remember { mutableStateOf(false) }
     var authDialog by remember { mutableStateOf<String?>(null) }
     var overlayNeeded by remember { mutableStateOf(false) }
     var notifAccessNeeded by remember { mutableStateOf(false) }
+    var notifGranted by remember { mutableStateOf(StatusNotification.hasPermission(context)) }
+    var prereqRefresh by remember { mutableStateOf(0) }
 
     val loginLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { res ->
         teslaStatus = session.statusLabel()
+        prereqRefresh++
         if (res.resultCode == Activity.RESULT_OK) {
             Log.d(TAG, "auth: connexion réussie")
         } else {
@@ -114,6 +127,7 @@ private fun WazeScreen() {
     val adminLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
+        prereqRefresh++
         Log.d(TAG, "admin: actif=${ScreenOff.isActive(context)}")
         // On revient au premier plan : (re)garantit que la surveillance tourne.
         DestinationService.start(context)
@@ -123,6 +137,7 @@ private fun WazeScreen() {
         ActivityResultContracts.StartActivityForResult()
     ) {
         overlayNeeded = !Permissions.canDrawOverlays(context)
+        prereqRefresh++
         Log.d(TAG, "overlay: accordée=${!overlayNeeded}")
         DestinationService.start(context)
         if (!overlayNeeded && settings.screenOff && !ScreenOff.isActive(context)) {
@@ -132,12 +147,17 @@ private fun WazeScreen() {
 
     val notifLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { granted -> Log.d(TAG, "notif: permission=$granted") }
+    ) { granted ->
+        notifGranted = granted
+        prereqRefresh++
+        Log.d(TAG, "notif: permission=$granted")
+    }
 
     val notifAccessLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
         notifAccessNeeded = !Permissions.hasNotificationAccess(context)
+        prereqRefresh++
         Log.d(TAG, "notif-listener: accordé=${!notifAccessNeeded}")
         DestinationService.start(context)
     }
@@ -174,6 +194,7 @@ private fun WazeScreen() {
             )
         )
         teslaStatus = session.statusLabel()
+        prereqRefresh++
         Log.d(TAG, "auth: jeton collé (expire à $expiry)")
         DestinationService.start(context)
     }
@@ -181,6 +202,7 @@ private fun WazeScreen() {
     fun disconnectTesla() {
         session.clear()
         teslaStatus = session.statusLabel()
+        prereqRefresh++
         DestinationService.stop(context)
     }
 
@@ -196,7 +218,7 @@ private fun WazeScreen() {
         store.setServiceEnabled(true)
         DestinationService.start(context)
 
-        if (!StatusNotification.hasPermission(context)) {
+        if (!notifGranted) {
             // Android 13+ : sans elle, aucun logo dans la barre système.
             notifLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
@@ -213,6 +235,30 @@ private fun WazeScreen() {
         }
     }
 
+    val token = session.token()
+    val prerequisites = remember(
+        prereqRefresh,
+        settings,
+        running,
+        teslaStatus,
+        overlayNeeded,
+        notifAccessNeeded,
+        notifGranted
+    ) {
+        evaluatePrerequisites(
+            teslaConnected = token != null && (!token.isExpiring() || token.refresh != null),
+            overlayGranted = Permissions.canDrawOverlays(context),
+            notificationsGranted = notifGranted,
+            notificationAccessGranted = Permissions.hasNotificationAccess(context),
+            wazeInstalled = WazeLauncher.isInstalled(context),
+            serviceRunning = running,
+            screenOffEnabled = settings.screenOff,
+            screenOffAdminGranted = ScreenOff.isActive(context)
+        )
+    }
+    val allSatisfied = prerequisites.allSatisfied()
+    val missing = prerequisites.missingCount()
+
     Box(modifier = Modifier.fillMaxSize().background(ColBg)) {
         Column(
             modifier = Modifier
@@ -224,19 +270,25 @@ private fun WazeScreen() {
             Text("TeslaWaze", color = ColTeal, fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(14.dp))
             Text(status, color = ColWazeText, fontSize = 14.sp, textAlign = TextAlign.Center)
-            Spacer(Modifier.height(18.dp))
-            Text(
-                "Tesla : $teslaStatus",
-                color = ColWhite,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                if (!running) "Surveillance arrêtée"
-                else if (WazeLauncher.isInstalled(context)) "Waze installé — surveillance active"
-                else "Waze absent",
-                color = if (running) ColTeal else ColWazeText,
-                fontSize = 12.sp
+        }
+
+        // État des prérequis : discret, en haut à gauche. Turquoise = tout est bon.
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 8.dp, start = 8.dp)
+                .size(48.dp)
+                .clickable { showPrereqs = true }
+                .semantics {
+                    contentDescription = if (allSatisfied) "Prérequis remplis"
+                    else "$missing prérequis manquant${if (missing > 1) "s" else ""}"
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(10.dp)
+                    .background(if (allSatisfied) ColTeal else ColOrange, CircleShape)
             )
         }
 
@@ -337,6 +389,72 @@ private fun WazeScreen() {
             dismissButton = {
                 TextButton(onClick = { notifAccessNeeded = false }) {
                     Text("Plus tard", color = ColWazeText)
+                }
+            }
+        )
+    }
+
+    if (showPrereqs) {
+        AlertDialog(
+            onDismissRequest = { showPrereqs = false },
+            containerColor = ColDialog,
+            titleContentColor = ColTeal,
+            textContentColor = ColWazeText,
+            title = { Text("Prérequis", fontWeight = FontWeight.SemiBold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        if (allSatisfied) "Toutes les conditions sont remplies."
+                        else "$missing prérequis manquant${if (missing > 1) "s" else ""}.",
+                        color = if (allSatisfied) ColTeal else ColOrange,
+                        fontSize = 12.sp
+                    )
+                    prerequisites.forEach { prereq ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(7.dp)
+                                    .background(
+                                        when {
+                                            !prereq.required -> ColTealDim
+                                            prereq.ok -> ColTeal
+                                            else -> ColOrange
+                                        },
+                                        CircleShape
+                                    )
+                            )
+                            Spacer(Modifier.width(10.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    prereq.label,
+                                    color = if (prereq.required) ColWhite else ColWazeText,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Text(
+                                    prereq.detail,
+                                    color = when {
+                                        !prereq.required -> ColWazeText
+                                        prereq.ok -> ColTeal
+                                        else -> ColOrange
+                                    },
+                                    fontSize = 11.sp
+                                )
+                            }
+                        }
+                    }
+                    if (!allSatisfied) {
+                        Text(
+                            "Les réglages permettent d'accorder les autorisations manquantes.",
+                            color = ColWazeText,
+                            fontSize = 11.sp
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showPrereqs = false }) {
+                    Text("Fermer", color = ColTeal)
                 }
             }
         )

@@ -56,7 +56,9 @@ DestinationService  ── décision ──►  Waze (arrière-plan, alertes)
 
 L'activité (`MainActivity`) n'est qu'un tableau de bord : la surveillance vit dans un service de
 premier plan (`DestinationService`), qui survit à l'appui sur « retour » et au redémarrage du
-téléphone.
+téléphone. Son point d'état en haut à gauche est calculé par `evaluatePrerequisites()`
+(`Prerequisites.kt`, sans dépendance Android) : turquoise si toutes les conditions obligatoires
+sont remplies, orange sinon. Un appui ouvre le détail.
 
 ---
 
@@ -246,6 +248,7 @@ Application mono-module `:app`, Kotlin + Jetpack Compose.
 | `StatusNotification.kt` | notification permanente (logo T) |
 | `Permissions.kt` | autorisations spéciales (Superposer, accès notifications) |
 | `MainActivity.kt` / `SettingsScreen.kt` | tableau de bord et réglages |
+| `Prerequisites.kt` | calcul de l'indicateur d'état et de la liste des prérequis (testé unitairement) |
 | `WazeSettings.kt` | réglages persistés (`SharedPreferences`) |
 
 ### Stack
