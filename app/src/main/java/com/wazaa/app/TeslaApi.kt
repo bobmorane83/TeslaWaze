@@ -33,7 +33,12 @@ class TeslaApi(
      * Hôte **Fleet API** de secours, déduit du JWT (`aud`) : l'API historique répond
      * désormais « Endpoint is only available on fleetapi ».
      */
-    private val fleetFallbackUrl: String? = null
+    private val fleetFallbackUrl: String? = null,
+    /**
+     * Chemin de découverte des véhicules : `/api/1/products` pour l'API historique
+     * (c'est ce qu'utilise TeslaMate), `/api/1/vehicles` pour la Fleet API.
+     */
+    private val listPath: String = "/api/1/vehicles"
 ) {
 
     private var root = baseUrl.trimEnd('/')
@@ -62,7 +67,7 @@ class TeslaApi(
     )
 
     suspend fun vehicles(token: String): List<Vehicle> = withContext(Dispatchers.IO) {
-        val o = getJson("/api/1/vehicles", token)
+        val o = getJson(listPath, token)
         val arr = o.optJSONArray("response") ?: return@withContext emptyList()
         (0 until arr.length()).mapNotNull { i ->
             val v = arr.optJSONObject(i) ?: return@mapNotNull null

@@ -66,7 +66,13 @@ class TeslaSession(
      */
     fun api(token: TeslaToken): TeslaApi {
         val fleet = TeslaAuth.fleetBaseFromJwt(token.access)
-        return if (fleet != null) TeslaApi(fleet) else TeslaApi(settings().teslaApiBase)
+        return if (fleet != null) {
+            TeslaApi(fleet)
+        } else {
+            // Jeton historique (ownerapi) : `/api/1/products` est l'endpoint de liste
+            // utilisé par TeslaMate ; `/api/1/vehicles` est réservé à la Fleet API.
+            TeslaApi(settings().teslaApiBase, listPath = "/api/1/products")
+        }
     }
 
     /** Libellé d'état pour l'UI. */
