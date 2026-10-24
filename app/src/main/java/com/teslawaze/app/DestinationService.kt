@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
+import android.os.SystemClock
 import android.util.Log
 import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
@@ -59,15 +60,38 @@ class DestinationService : Service() {
         fun stop(context: Context) {
             context.stopService(Intent(context, DestinationService::class.java))
         }
+
+        /**
+         * « Quitter » : passe par le service pour qu'il puisse fermer Waze s'il l'a lancé,
+         * puis s'arrête. Utilisé par l'écran et par l'action « Quitter » de la notification.
+         */
+        fun requestQuit(context: Context) {
+            val i = Intent(context, DestinationService::class.java).setAction(ACTION_STOP)
+            try {
+                context.startService(i)
+            } catch (e: Exception) {
+                Log.w(TAG, "service: quit refusé: ${e.javaClass.simpleName} ${e.message}")
+                context.stopService(Intent(context, DestinationService::class.java))
+            }
+        }
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var loopJob: Job? = null
+    private var watchdogJob: Job? = null
     private lateinit var store: SettingsStore
     private lateinit var session: TeslaSession
 
     /** Destination actuellement confiée à Waze (`null` = Waze non lancé par nous). */
     private val pilot = WazePilot(STOP_CONFIRMATIONS)
+
+    /** Dernière destination envoyée à Waze, utilisée par le watchdog. */
+    @Volatile
+    private var watchdogDestination: TeslaApi.Destination? = null
+
+    /** Horodatage (elapsedRealtime) du dernier deep link, pour éviter les relances en rafale. */
+    @Volatile
+    private var lastLaunchElapsedMs = 0L
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -101,6 +125,7 @@ class DestinationService : Service() {
         }
 
         if (loopJob?.isActive != true) loopJob = scope.launch { loop() }
+        if (watchdogJob?.isActive != true) watchdogJob = scope.launch { watchdogLoop() }
         return START_STICKY // le système relance le service s'il est tué sous pression mémoire
     }
 
@@ -118,6 +143,11 @@ class DestinationService : Service() {
     }
 
     private fun quit() {
+        // Si c'est nous qui avons lancé Waze, on le ferme avant de disparaître.
+        if (pilot.wazeLaunched) {
+            val closed = WazeStopper.stop(applicationContext)
+            Log.d(TAG, "service: fermeture de Waze demandée=$closed")
+        }
         store.setServiceEnabled(false)
         Log.d(TAG, "service: quit demandé")
         WatcherState.text.value = "Arrêté"
@@ -204,6 +234,48 @@ class DestinationService : Service() {
         }
     }
 
+    /**
+     * Watchdog : toutes les 15 s, vérifie que Waze publie toujours sa notification de
+     * navigation. Si elle a disparu (Waze fermé, planté ou navigation arrêtée), renvoie la
+     * dernière destination Tesla.
+     *
+     * Limite assumée : Waze n'expose pas sa destination interne. On ne peut donc pas
+     * comparer l'itinéraire Waze à celui de la Tesla ; on vérifie seulement que la
+     * navigation Waze est encore active. Si elle l'est, on ne la touche pas.
+     */
+    private suspend fun watchdogLoop() {
+        while (currentCoroutineContext().isActive) {
+            delay(WazeWatchdog.INTERVAL_MS)
+
+            val settings = store.load()
+            if (!settings.wazeWatchdog) continue
+
+            val dest = watchdogDestination ?: continue
+            if (!pilot.wazeLaunched) continue
+
+            val sinceLaunch = SystemClock.elapsedRealtime() - lastLaunchElapsedMs
+            val running = WazeNotificationListener.isWazeRunning()
+            if (!WazeWatchdog.shouldRelaunch(
+                    enabled = true,
+                    shouldBeRunning = true,
+                    wazeRunning = running,
+                    sinceLaunchMs = sinceLaunch
+                )
+            ) {
+                continue
+            }
+
+            Log.d(TAG, "watchdog: Waze inactif — relance de la destination")
+            val ok = WazeLauncher.launch(this, dest.lat, dest.lon)
+            if (ok) {
+                lastLaunchElapsedMs = SystemClock.elapsedRealtime()
+                publish("Waze relancé — ${dest.name ?: "destination Tesla"}")
+            } else {
+                publish("Waze introuvable")
+            }
+        }
+    }
+
     /** Applique la décision de la machine à états. */
     private fun apply(action: WazePilot.Action) {
         when (action) {
@@ -211,9 +283,13 @@ class DestinationService : Service() {
 
             is WazePilot.Action.Idle -> publish(action.text, log = false)
 
-            is WazePilot.Action.Launch -> launch(action.destination)
+            is WazePilot.Action.Launch -> {
+                watchdogDestination = action.destination
+                launch(action.destination)
+            }
 
             is WazePilot.Action.Stop -> {
+                watchdogDestination = null
                 val ok = WazeStopper.stop(this)
                 Log.d(TAG, "waze: arrêt (${action.reason}) demandé=$ok")
                 publish(
@@ -239,6 +315,7 @@ class DestinationService : Service() {
             publish("Waze introuvable")
             return
         }
+        lastLaunchElapsedMs = SystemClock.elapsedRealtime()
         publish("Waze lancé — ${dest.name ?: "destination Tesla"}")
 
         val screenOff = store.load().screenOff

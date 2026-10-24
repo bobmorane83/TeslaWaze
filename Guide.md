@@ -227,7 +227,8 @@ Certains téléphones (Xiaomi, Samsung, Huawei, Oppo…) arrêtent les applicati
 5. **À l'arrivée** : garer le véhicule en `P`, ou effacer la navigation. Waze se ferme dès
    la lecture suivante (au plus ~1 minute) si le véhicule est arrêté.
 6. **Toucher l'engrenage** en haut à droite ouvre les réglages ; **« Quitter »** arrête la surveillance
-   jusqu'à la prochaine ouverture de l'application.
+   jusqu'à la prochaine ouverture de l'application. Si TeslaWaze avait lancé Waze, il le ferme
+   également.
 
 La notification permanente (logo **T**) indique ce que fait l'application et propose
 « Ouvrir » et « Quitter ».
@@ -243,9 +244,15 @@ Toucher l'**engrenage** en haut à droite ouvre les réglages.
 | **Superposer** | indique si l'autorisation nécessaire est accordée ; bouton pour la demander |
 | **Accès aux notifications** | idem pour l'autorisation qui permet de fermer Waze |
 | **Éteindre l'écran après le lancement** | verrouille l'écran après l'ouverture de Waze (défaut : activé) |
+| **Relancer Waze toutes les 15 s s'il n'est plus actif** | vérifie que la navigation Waze tourne encore ; si Waze a été fermé, renvoie la destination Tesla (défaut : désactivé) |
 | **Délais** | intervalles de lecture de l'API Tesla (en ligne 10–120 s, endormi/erreur 10–60 s ; défauts 60 / 30 / 30 s) |
 | **Compte Tesla** | état de la connexion, boutons **Se connecter**, **Coller un token**, **Se déconnecter** |
 | **Avancé** | réglages réservés : ne pas modifier sans consigne (identification du véhicule, cas particuliers) |
+
+Le **watchdog Waze** n'agit que lorsqu'une **destination Tesla est active**. Sans destination
+dans la voiture, il ne lance rien. Waze ne permet pas de lire sa destination interne : le
+watchdog vérifie que sa notification de navigation est toujours présente, et renvoie la
+destination Tesla si Waze a été fermé.
 
 En usage normal, seuls la connexion Tesla et l'option d'écran sont à toucher. Les champs
 « Avancé » ne servent qu'en cas de besoin particulier.

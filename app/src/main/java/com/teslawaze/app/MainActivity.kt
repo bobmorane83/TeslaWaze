@@ -186,7 +186,7 @@ private fun WazeScreen() {
 
     fun quit() {
         store.setServiceEnabled(false)
-        DestinationService.stop(context)
+        DestinationService.requestQuit(context)
         (context as? Activity)?.finish()
     }
 

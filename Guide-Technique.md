@@ -103,6 +103,7 @@ unitairement).
 | Véhicule garé (`P`) **après avoir roulé** | **Arrêter immédiatement** |
 | Véhicule hors ligne / endormi | **Arrêter** après confirmation |
 | Destination déjà arrêtée | Ne pas relancer tant que le véhicule ne repart pas |
+| Watchdog actif, destination en cours, mais Waze ne publie plus sa notification | **Relancer** Waze sur la destination Tesla |
 
 Détails :
 
@@ -115,6 +116,12 @@ Détails :
 - **Destinations factices ignorées** : certains firmwares renvoient « Tesla », des coordonnées
   nulles ou la position du véhicule sans ETA lorsque la navigation est inactive. Ces valeurs
   sont traitées comme « pas de destination » (sinon Waze ne s'arrêterait jamais).
+- **Watchdog** (`WazeWatchdog.kt`) : toutes les 15 s, si l'option est active, si une
+  destination est en cours et si Waze ne publie plus sa notification de navigation, la
+  dernière destination Tesla est renvoyée. Un délai de grâce de 20 s après un lancement évite
+  les relances en rafale. Waze n'exposant pas sa destination interne, le watchdog ne peut pas
+  comparer l'itinéraire Waze à celui de la Tesla : il garantit seulement que la navigation
+  Waze est toujours active. Sans destination Tesla, il ne fait rien.
 
 ---
 
@@ -176,7 +183,7 @@ Sur un téléphone non rooté, `lockNow()` est la seule extinction disponible :
 |---|---|
 | Ouverture de l'application | surveillance (ré)activée |
 | Appui sur « retour » | la surveillance continue |
-| « Quitter » (écran ou notification) | `serviceEnabled = false`, service arrêté |
+| « Quitter » (écran ou notification) | `serviceEnabled = false`, Waze fermé s'il a été lancé par l'app, service arrêté |
 | Redémarrage du téléphone | `BootReceiver` relance si `serviceEnabled` **et** jeton présent |
 | Service tué par le système | relance Android (`START_STICKY`) |
 
@@ -226,6 +233,7 @@ Application mono-module `:app`, Kotlin + Jetpack Compose.
 |---|---|
 | `DestinationService.kt` | service de premier plan, boucle de surveillance, application des décisions |
 | `WazePilot.kt` | machine à états lancement / arrêt (testée unitairement) |
+| `WazeWatchdog.kt` | décision de relance toutes les 15 s (testée unitairement) |
 | `TeslaApi.kt` | client minimal de l'API Fleet (HTTP + JSON) |
 | `TeslaAuth.kt` | OAuth2 PKCE, rafraîchissement, `TeslaTokenStore` chiffré |
 | `TeslaSession.kt` | jeton valide, ID véhicule, hôte Fleet déduit du JWT |
@@ -295,7 +303,8 @@ Ou dans Android Studio : ouvrir le projet, synchroniser Gradle, puis **Run**.
 ```
 
 `WazePilotTest` couvre les règles de décision : lancement, relance, arrêt confirmé, anti-rebond,
-reprise après arrêt — sans téléphone ni véhicule.
+reprise après arrêt — sans téléphone ni véhicule. `WazeWatchdogTest` couvre l'option on/off,
+l'absence de destination, l'absence d'accès aux notifications, le délai de grâce et la relance.
 
 ---
 

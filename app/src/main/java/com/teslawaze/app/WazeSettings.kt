@@ -11,6 +11,8 @@ import android.content.Context
  */
 data class WazeSettings(
     val screenOff: Boolean = DEFAULT_SCREEN_OFF,
+    /** Relance Waze avec la destination Tesla s'il n'est plus actif (toutes les 15 s). */
+    val wazeWatchdog: Boolean = DEFAULT_WAZE_WATCHDOG,
     val teslaAuthBase: String = TeslaAuth.DEFAULT_AUTH_BASE,
     val teslaApiBase: String = DEFAULT_TESLA_API_BASE,
     /** `client_id` de l'application Fleet API (developer.tesla.com) — vide si non enregistrée. */
@@ -37,6 +39,9 @@ data class WazeSettings(
 
     companion object {
         const val DEFAULT_SCREEN_OFF = true
+
+        /** Désactivé par défaut : le watchdog relance Waze, il ne doit pas surprendre. */
+        const val DEFAULT_WAZE_WATCHDOG = false
 
         /** Hôte utilisé par TeslaMate (`get/2`, `get_with_state/2`). */
         const val DEFAULT_TESLA_API_BASE = "https://owner-api.teslamotors.com"
@@ -70,6 +75,7 @@ class SettingsStore(context: Context) {
 
     fun load(): WazeSettings = WazeSettings(
         screenOff = prefs.getBoolean(KEY_SCREEN_OFF, WazeSettings.DEFAULT_SCREEN_OFF),
+        wazeWatchdog = prefs.getBoolean(KEY_WAZE_WATCHDOG, WazeSettings.DEFAULT_WAZE_WATCHDOG),
         teslaAuthBase = prefs.getString(KEY_AUTH_BASE, null)
             ?.takeIf { it.isNotBlank() } ?: TeslaAuth.DEFAULT_AUTH_BASE,
         teslaApiBase = prefs.getString(KEY_API_BASE, null)
@@ -92,6 +98,7 @@ class SettingsStore(context: Context) {
     fun save(s: WazeSettings) {
         prefs.edit()
             .putBoolean(KEY_SCREEN_OFF, s.screenOff)
+            .putBoolean(KEY_WAZE_WATCHDOG, s.wazeWatchdog)
             .putString(KEY_AUTH_BASE, s.teslaAuthBase)
             .putString(KEY_API_BASE, s.teslaApiBase)
             .putString(KEY_CLIENT_ID, s.teslaClientId)
@@ -114,6 +121,7 @@ class SettingsStore(context: Context) {
 
     private companion object {
         const val KEY_SCREEN_OFF = "waze_screen_off"
+        const val KEY_WAZE_WATCHDOG = "waze_watchdog"
         const val KEY_AUTH_BASE = "tesla_auth_base"
         const val KEY_API_BASE = "tesla_api_base"
         const val KEY_CLIENT_ID = "tesla_client_id"

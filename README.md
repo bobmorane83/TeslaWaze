@@ -31,6 +31,8 @@ d'annoncer les événements. Quand le trajet est terminé, Waze se referme.
 - ✅ **La Tesla continue de guider** : son planificateur d'itinéraire reste la référence
 - ✅ **Lancement automatique** de Waze dès qu'une destination apparaît sur le compte Tesla
 - ✅ **Relance automatique** si la destination change
+- ✅ **Watchdog Waze** (option) : toutes les 15 s, relance Waze s'il n'est plus actif, uniquement
+  lorsqu'une destination Tesla est en cours
 - ✅ **Fermeture automatique** de Waze : destination retirée, véhicule garé ou hors ligne
 - ✅ **Délais de lecture réglables** dans les paramètres (en ligne 10–120 s, endormi/erreur 10–60 s)
 - ✅ **Extinction de l'écran** après le lancement (option), pour économiser la batterie
@@ -55,7 +57,8 @@ Chaque étape est détaillée dans le **[guide d'utilisation](Guide.md#4-premiè
 - Suivre l'itinéraire affiché par la Tesla ; Waze reste en arrière-plan et annonce les
   événements.
 - À l'arrivée (véhicule garé ou navigation arrêtée), Waze se ferme dès la lecture suivante.
-- Toucher l'engrenage en haut à droite ouvre les réglages ; « Quitter » arrête la surveillance.
+- Toucher l'engrenage en haut à droite ouvre les réglages ; « Quitter » arrête la surveillance
+  et ferme Waze si TeslaWaze l'avait lancé.
 
 ## Bon à savoir
 

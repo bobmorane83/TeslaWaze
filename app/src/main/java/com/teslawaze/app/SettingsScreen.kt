@@ -108,6 +108,21 @@ fun SettingsScreen(
             onCheckedChange = { onChange(settings.copy(screenOff = it)) }
         )
 
+        Spacer(Modifier.height(8.dp))
+
+        SwitchRow(
+            label = "Relancer Waze toutes les 15 s s'il n'est plus actif",
+            checked = settings.wazeWatchdog,
+            onCheckedChange = { onChange(settings.copy(wazeWatchdog = it)) }
+        )
+        Text(
+            "Actif uniquement lorsqu'une destination Tesla est en cours. Waze ne permet pas " +
+                    "de lire sa destination interne : le contrôle vérifie que sa notification " +
+                    "de navigation est toujours présente, et renvoie la destination Tesla sinon.",
+            color = ColWazeText,
+            fontSize = 11.sp
+        )
+
         Spacer(Modifier.height(16.dp))
 
         Text("Délais", color = ColTeal, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
