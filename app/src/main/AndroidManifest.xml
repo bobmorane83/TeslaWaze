@@ -5,7 +5,7 @@
       Permissions :
         INTERNET                      lire la destination sur le compte Tesla ;
         FOREGROUND_SERVICE(_SPECIAL_USE) la surveillance tourne dans un service permanent ;
-        POST_NOTIFICATIONS            logo T dans la barre système (Android 13+) ;
+        POST_NOTIFICATIONS            boussole dans la barre système (Android 13+) ;
         KILL_BACKGROUND_PROCESSES     arrêter Waze (destination terminée / véhicule garé) ;
         RECEIVE_BOOT_COMPLETED        relancer la surveillance après un redémarrage.
       Aucune permission de localisation : Waze gère lui-même le GPS.
@@ -36,11 +36,11 @@
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
-        android:label="TeslaWaze"
+        android:label="Wazaa"
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.TeslaWaze">
+        android:theme="@style/Theme.Wazaa">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -80,7 +80,7 @@
         <service
             android:name=".WazeNotificationListener"
             android:exported="true"
-            android:label="TeslaWaze"
+            android:label="Wazaa"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />

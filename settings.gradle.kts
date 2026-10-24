@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "TeslaWaze"
+rootProject.name = "Wazaa"
 include(":app")

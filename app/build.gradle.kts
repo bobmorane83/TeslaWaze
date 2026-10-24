@@ -15,18 +15,18 @@ fun secret(key: String, def: String = ""): String =
     (secrets.getProperty(key) ?: System.getenv(key) ?: def)
 
 android {
-    namespace = "com.teslawaze.app"
+    namespace = "com.wazaa.app"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.teslawaze.app"
+        applicationId = "com.wazaa.app"
         minSdk = 26
         targetSdk = 34
         versionCode = 2
         versionName = "0.1.1"
 
         buildConfigField("String", "TESLA_CLIENT_ID", "\"${secret("TESLA_CLIENT_ID")}\"")
-        buildConfigField("String", "TESLA_REDIRECT_URI", "\"${secret("TESLA_REDIRECT_URI", "com.teslawaze.app://oauth")}\"")
+        buildConfigField("String", "TESLA_REDIRECT_URI", "\"${secret("TESLA_REDIRECT_URI", "com.wazaa.app://oauth")}\"")
     }
 
     buildFeatures {

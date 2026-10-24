@@ -1,8 +1,8 @@
-# Guide d'utilisation de TeslaWaze
+# Guide d'utilisation de Wazaa
 
 > Version 0.1.1 — Android 8.0 ou plus récent
 
-TeslaWaze fait une chose simple : il lance **Waze en arrière-plan** pour vous prévenir des
+Wazaa fait une chose simple : il lance **Waze en arrière-plan** pour vous prévenir des
 **événements signalés par la communauté** (police, danger, bouchon…). **Le guidage reste celui
 de votre Tesla** : Waze ne vous guide pas et ne parle pas à sa place.
 
@@ -27,18 +27,18 @@ Ce guide explique tout ce qu'il faut faire, sans connaissances techniques.
 
 ## 1. Ce que fait l'application
 
-Pendant que vous conduisez, votre Tesla calcule et affiche l'itinéraire. TeslaWaze utilise votre
+Pendant que vous conduisez, votre Tesla calcule et affiche l'itinéraire. Wazaa utilise votre
 téléphone uniquement pour **faire parler Waze des événements** rencontrés sur le trajet.
 
 Concrètement :
 
 - vous programmez la destination dans la Tesla ;
-- TeslaWaze ouvre Waze sur cette destination, puis le met en arrière-plan ;
+- Wazaa ouvre Waze sur cette destination, puis le met en arrière-plan ;
 - **la Tesla continue de vous guider** ; Waze annonce seulement les événements ;
 - à l'arrivée (véhicule garé ou navigation arrêtée), Waze se ferme automatiquement ;
 - en option, l'écran du téléphone se verrouille après le lancement pour économiser la batterie.
 
-> TeslaWaze n'est **pas** un GPS. Il ne remplace pas le planificateur de la Tesla et n'affiche
+> Wazaa n'est **pas** un GPS. Il ne remplace pas le planificateur de la Tesla et n'affiche
 > aucun itinéraire.
 
 ---
@@ -58,10 +58,10 @@ Aucune voiture n'est nécessaire pour la configuration, mais le test final oui.
 
 ## 3. Installer l'application
 
-TeslaWaze n'est pas disponible sur le Play Store. Il s'installe à partir d'un fichier APK :
+Wazaa n'est pas disponible sur le Play Store. Il s'installe à partir d'un fichier APK :
 
 1. Télécharger la dernière version depuis la page
-   [Releases](https://github.com/bobmorane83/TeslaWaze/releases/latest), ou copier le fichier
+   [Releases](https://github.com/bobmorane83/Wazaa/releases/latest), ou copier le fichier
    d'installation (`app-debug.apk`) sur le téléphone.
 2. L'ouvrir depuis l'explorateur de fichiers.
 3. Si Android le demande, autoriser l'installation depuis cette source.
@@ -76,15 +76,15 @@ retrouver plus tard en touchant l'engrenage en haut à droite de l'application.
 
 ### 4.1 Ouvrir l'application
 
-Au premier lancement, TeslaWaze démarre sa surveillance et vous présente les demandes
+Au premier lancement, Wazaa démarre sa surveillance et vous présente les demandes
 d'autorisation. L'écran principal affiche l'état de la surveillance.
 
 ### 4.2 Autoriser les notifications
 
-**Pourquoi** : afficher le logo **T** dans la barre du téléphone et proposer les boutons
+**Pourquoi** : afficher la **boussole** dans la barre du téléphone et proposer les boutons
 « Ouvrir » et « Quitter ».
 
-**Comment** : accepter la demande « Autoriser TeslaWaze à envoyer des notifications ? ».
+**Comment** : accepter la demande « Autoriser Wazaa à envoyer des notifications ? ».
 
 ### 4.3 Autoriser « Afficher par-dessus les autres applications »
 
@@ -95,27 +95,27 @@ l'autorisation sert uniquement à permettre ce démarrage.
 **Comment** :
 
 1. Dans la fenêtre « Autorisation requise », toucher **Autoriser**.
-2. Activer le commutateur **TeslaWaze** dans l'écran qui s'ouvre.
+2. Activer le commutateur **Wazaa** dans l'écran qui s'ouvre.
 3. Revenir à l'application.
 
 Vérification : les réglages indiquent « Autorisation « Superposer » : accordée ».
 
 ### 4.4 Autoriser l'accès aux notifications
 
-**Pourquoi** : c'est ce qui permet à TeslaWaze d'appuyer sur le bouton **« Éteindre »** de la
+**Pourquoi** : c'est ce qui permet à Wazaa d'appuyer sur le bouton **« Éteindre »** de la
 notification de Waze, seule façon de le fermer proprement. **Aucun contenu n'est lu.**
 
 **Comment** :
 
 1. Toucher **Autoriser** dans la fenêtre.
-2. Activer **TeslaWaze** dans « Accès aux notifications ».
+2. Activer **Wazaa** dans « Accès aux notifications ».
 3. Revenir à l'application.
 
 Vérification : les réglages indiquent « Accès aux notifications : accordé ».
 
 ### 4.5 Connecter votre compte Tesla
 
-TeslaWaze a besoin de lire la destination programmée dans votre Tesla. Deux méthodes existent ;
+Wazaa a besoin de lire la destination programmée dans votre Tesla. Deux méthodes existent ;
 la première est la plus simple.
 
 #### Méthode 1 — connexion guidée par l'application (recommandée)
@@ -136,7 +136,7 @@ Un **jeton** est un code d'accès temporaire généré par un outil de connexion
 1. Générez un jeton avec un outil reconnu :
    - **tesla_auth** (utilisé par TeslaMate) ;
    - ou l'application mobile **Auth app for Tesla**.
-2. Dans TeslaWaze, toucher l'**engrenage** en haut à droite pour ouvrir les réglages.
+2. Dans Wazaa, toucher l'**engrenage** en haut à droite pour ouvrir les réglages.
 3. Toucher **Coller un token**.
 4. Coller les deux codes fournis par l'outil, puis **Enregistrer**.
 
@@ -147,7 +147,7 @@ Pour les cas particuliers (application Tesla personnelle, réglages avancés), v
 
 ### 4.6 Si l'application le demande : identifier votre véhicule
 
-Il arrive que TeslaWaze ne puisse pas retrouver votre voiture tout seul. L'application affiche
+Il arrive que Wazaa ne puisse pas retrouver votre voiture tout seul. L'application affiche
 alors « ID véhicule manquant ».
 
 1. Toucher l'**engrenage** en haut à droite → **Avancé**.
@@ -169,7 +169,7 @@ le lancement »).
 
 ### 4.8 Configurer Waze (important)
 
-TeslaWaze ne modifie pas les réglages internes de Waze. Pour que Waze n'ajoute **que les
+Wazaa ne modifie pas les réglages internes de Waze. Pour que Waze n'ajoute **que les
 alertes** et ne double pas le guidage de la Tesla :
 
 1. Ouvrir **Waze** → **Paramètres** → **Voix et son**.
@@ -183,9 +183,9 @@ Les libellés peuvent varier selon la version de Waze.
 
 Certains téléphones (Xiaomi, Samsung, Huawei, Oppo…) arrêtent les applications en arrière-plan.
 
-1. **Paramètres → Applications → TeslaWaze → Batterie** → choisir **« Non restreinte »** (ou
+1. **Paramètres → Applications → Wazaa → Batterie** → choisir **« Non restreinte »** (ou
    « Sans restriction »).
-2. Si votre téléphone le propose, autoriser le **démarrage automatique** de TeslaWaze.
+2. Si votre téléphone le propose, autoriser le **démarrage automatique** de Wazaa.
 
 ### 4.10 Tester
 
@@ -202,7 +202,7 @@ Certains téléphones (Xiaomi, Samsung, Huawei, Oppo…) arrêtent les applicati
 
 ### 4.11 Récapitulatif
 
-- [ ] Installer l'APK et ouvrir TeslaWaze
+- [ ] Installer l'APK et ouvrir Wazaa
 - [ ] Autoriser les notifications
 - [ ] Autoriser « Afficher par-dessus les autres applications »
 - [ ] Autoriser l'accès aux notifications
@@ -210,14 +210,14 @@ Certains téléphones (Xiaomi, Samsung, Huawei, Oppo…) arrêtent les applicati
 - [ ] Renseigner l'ID véhicule si l'application le demande
 - [ ] Autoriser le verrouillage de l'écran (si extinction d'écran souhaitée)
 - [ ] Configurer Waze : guidage vocal coupé, alertes actives
-- [ ] Désactiver l'optimisation de batterie pour TeslaWaze
+- [ ] Désactiver l'optimisation de batterie pour Wazaa
 - [ ] Faire le test de bout en bout
 
 ---
 
 ## 5. Utilisation au quotidien
 
-1. **Ouvrir TeslaWaze une fois** après l'installation, ou après avoir utilisé « Quitter ».
+1. **Ouvrir Wazaa une fois** après l'installation, ou après avoir utilisé « Quitter ».
    L'application peut ensuite rester en arrière-plan.
 2. **Programmer la destination** dans la Tesla (écran du véhicule ou application Tesla).
 3. **Suivre l'itinéraire de la Tesla** : Waze s'ouvre seul, passe en arrière-plan et annonce les
@@ -228,12 +228,12 @@ Certains téléphones (Xiaomi, Samsung, Huawei, Oppo…) arrêtent les applicati
 5. **À l'arrivée** : garer le véhicule en `P`, ou effacer la navigation. Waze se ferme dès
    la lecture suivante (au plus ~1 minute) si le véhicule est arrêté.
 6. **Toucher l'engrenage** en haut à droite ouvre les réglages ; **« Quitter »** arrête la surveillance
-   jusqu'à la prochaine ouverture de l'application. Si TeslaWaze avait lancé Waze, il le ferme
+   jusqu'à la prochaine ouverture de l'application. Si Wazaa avait lancé Waze, il le ferme
    également.
 7. **Toucher le point en haut à gauche** affiche l'état de tous les prérequis. Turquoise : tout
    fonctionne ; orange : une condition manque (le détail indique laquelle).
 
-La notification permanente (logo **T**) indique ce que fait l'application et propose
+La notification permanente (icône **boussole**) indique ce que fait l'application et propose
 « Ouvrir » et « Quitter ».
 
 ---
@@ -294,8 +294,8 @@ délai de confirmation d'arrêt : plus il est court, plus Waze se ferme vite.
 | Waze ne se ferme pas | accorder l'accès aux notifications ; accorder « Superposer » ; attendre jusqu'à 1 minute |
 | Waze parle en même temps que la Tesla | couper le guidage vocal dans Waze (§4.8) |
 | Aucune alerte audible | activer les alertes dans Waze ; augmenter le volume multimédia ; vérifier le Bluetooth |
-| La surveillance s'arrête seule | mettre TeslaWaze en batterie « Non restreinte » et autoriser le démarrage automatique |
-| Rien ne se passe après un redémarrage | rouvrir TeslaWaze (ou vérifier que « Quitter » n'a pas été utilisé) |
+| La surveillance s'arrête seule | mettre Wazaa en batterie « Non restreinte » et autoriser le démarrage automatique |
+| Rien ne se passe après un redémarrage | rouvrir Wazaa (ou vérifier que « Quitter » n'a pas été utilisé) |
 | Waze se ferme alors que le trajet continue | attendre : la fermeture n'a lieu qu'après deux vérifications concordantes |
 
 Pour un diagnostic approfondi, voir le [guide technique](Guide-Technique.md).
@@ -305,7 +305,7 @@ Pour un diagnostic approfondi, voir le [guide technique](Guide-Technique.md).
 ## 9. Bon à savoir
 
 - Android **8.0** minimum ; pas de version iOS.
-- TeslaWaze n'est **pas sur le Play Store** : l'installation se fait par APK.
+- Wazaa n'est **pas sur le Play Store** : l'installation se fait par APK.
 - Waze doit avoir une destination active pour connaître le trajet et annoncer les événements.
 - La fermeture est **immédiate à l'arrêt** ; en roulant, deux vérifications (jusqu'à 2 min)
   évitent un faux arrêt.

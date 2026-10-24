@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Fond de l'icône adaptative : couleur du carré de l'artwork (échantillonnée
-         au centre : #051218), pour qu'il n'y ait aucune couture entre le dessin et la forme
-         choisie par le lanceur. -->
-    <color name="ic_launcher_background">#051218</color>
+    <!-- Fond de l'icône adaptative : teinte sombre de la boussole, pour qu'il n'y ait
+         aucune couture entre le dessin et la forme choisie par le lanceur. -->
+    <color name="ic_launcher_background">#071A1D</color>
 </resources>

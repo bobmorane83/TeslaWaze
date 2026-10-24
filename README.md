@@ -1,20 +1,20 @@
-# TeslaWaze
+# Wazaa
 
 **Waze en arrière-plan pour les alertes d'événements, pendant que votre Tesla vous guide.**
 
 ![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white)
 ![Sans root](https://img.shields.io/badge/root-non%20requis-success)
 ![Sans GPS](https://img.shields.io/badge/localisation-non%20requise-informational)
-[![Dernière version](https://img.shields.io/github/v/release/bobmorane83/TeslaWaze)](https://github.com/bobmorane83/TeslaWaze/releases/latest)
+[![Dernière version](https://img.shields.io/github/v/release/bobmorane83/Wazaa)](https://github.com/bobmorane83/Wazaa/releases/latest)
 
-TeslaWaze lance Waze en arrière-plan pour vous prévenir des événements signalés par la
+Wazaa lance Waze en arrière-plan pour vous prévenir des événements signalés par la
 communauté (police, danger, bouchon…), **sans guidage vocal**. Le calculateur d'itinéraire de la
 Tesla reste la référence : Waze reçoit la destination pour connaître le trajet, puis se contente
 d'annoncer les événements. Quand le trajet est terminé, Waze se referme.
 
 ## Téléchargement
 
-📦 **[Télécharger la dernière version (APK)](https://github.com/bobmorane83/TeslaWaze/releases/latest)**
+📦 **[Télécharger la dernière version (APK)](https://github.com/bobmorane83/Wazaa/releases/latest)**
 — version **0.1.1**, APK de développement à installer manuellement.
 
 > 📘 **Guide d'utilisation complet (première installation pas à pas) :
@@ -41,7 +41,7 @@ d'annoncer les événements. Quand le trajet est terminé, Waze se referme.
 
 ## Démarrage rapide
 
-1. **Installer** l'APK, puis ouvrir TeslaWaze.
+1. **Installer** l'APK, puis ouvrir Wazaa.
 2. **Suivre les autorisations** demandées : notifications, « Afficher par-dessus les autres
    applications », accès aux notifications.
 3. **Connecter le compte Tesla** : réglages → **Se connecter** (l'application vous guide), ou
@@ -58,7 +58,7 @@ Chaque étape est détaillée dans le **[guide d'utilisation](Guide.md#4-premiè
   événements.
 - À l'arrivée (véhicule garé ou navigation arrêtée), Waze se ferme dès la lecture suivante.
 - Toucher l'engrenage en haut à droite ouvre les réglages ; « Quitter » arrête la surveillance
-  et ferme Waze si TeslaWaze l'avait lancé.
+  et ferme Waze si Wazaa l'avait lancé.
 
 ## Bon à savoir
 

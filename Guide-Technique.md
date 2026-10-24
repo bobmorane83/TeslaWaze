@@ -1,8 +1,8 @@
-# Guide technique de TeslaWaze
+# Guide technique de Wazaa
 
 > Version 0.1.1 — documentation du fonctionnement interne
 
-Ce document décrit l'architecture, les mécanismes et la compilation de TeslaWaze. Pour
+Ce document décrit l'architecture, les mécanismes et la compilation de Wazaa. Pour
 l'utilisation pas à pas, voir le [guide utilisateur](Guide.md).
 
 ---
@@ -132,18 +132,18 @@ Détails :
 Deep link officiel (aucun patch de Waze) :
 
 ```
-waze://?ll=<latitude>,<longitude>&navigate=yes&utm_source=teslawaze
+waze://?ll=<latitude>,<longitude>&navigate=yes&utm_source=wazaa
 ```
 
 - coordonnées formatées en `Locale.US` (point décimal), sinon le lien est ignoré ;
 - l'intent cible explicitement `com.waze.FreeMapAppActivity` : c'est le seul moyen fiable quand
   Waze tourne déjà ; un intent implicite sert de repli ;
-- Waze ignore parfois le lien pendant son démarrage à froid : TeslaWaze le renvoie **une fois
+- Waze ignore parfois le lien pendant son démarrage à froid : Wazaa le renvoie **une fois
   après 4 secondes** ;
 - si l'option d'écran est active, `lockNow()` est appelé environ 1 seconde après ce second
   envoi ;
 - la destination est transmise pour que Waze connaisse le trajet ; le guidage vocal doit être
-  coupé dans Waze, TeslaWaze ne modifie pas ses réglages internes.
+  coupé dans Waze, Wazaa ne modifie pas ses réglages internes.
 
 ---
 
@@ -219,7 +219,7 @@ et propose « Ouvrir » et « Quitter ».
 Pour utiliser votre propre application déclarée chez Tesla :
 
 1. Créer une application sur [developer.tesla.com](https://developer.tesla.com).
-2. Déclarer l'URI de redirection `com.teslawaze.app://oauth`.
+2. Déclarer l'URI de redirection `com.wazaa.app://oauth`.
 3. Renseigner le `client_id` et cette URI dans **Réglages → Avancé**.
 4. Utiliser « Se connecter ».
 
@@ -245,7 +245,7 @@ Application mono-module `:app`, Kotlin + Jetpack Compose.
 | `StopWazeActivity.kt` | prise de premier plan brève pour rendre le kill effectif |
 | `ScreenOffAdmin.kt` | administrateur de périphérique (`force-lock`) |
 | `BootReceiver.kt` | relance après redémarrage |
-| `StatusNotification.kt` | notification permanente (logo T) |
+| `StatusNotification.kt` | notification permanente (icône boussole) |
 | `Permissions.kt` | autorisations spéciales (Superposer, accès notifications) |
 | `MainActivity.kt` / `SettingsScreen.kt` | tableau de bord et réglages |
 | `Prerequisites.kt` | calcul de l'indicateur d'état et de la liste des prérequis (testé unitairement) |
@@ -270,8 +270,8 @@ Application mono-module `:app`, Kotlin + Jetpack Compose.
 ### Configuration
 
 ```bash
-git clone https://github.com/bobmorane83/TeslaWaze.git
-cd TeslaWaze
+git clone https://github.com/bobmorane83/Wazaa.git
+cd Wazaa
 ```
 
 `local.properties` (non versionné) :
@@ -285,7 +285,7 @@ Valeurs publiques facultatives, via `secrets.properties` (gitignoré, copié dep
 
 ```properties
 TESLA_CLIENT_ID=
-TESLA_REDIRECT_URI=com.teslawaze.app://oauth
+TESLA_REDIRECT_URI=com.wazaa.app://oauth
 ```
 
 Aucune clé secrète n'est nécessaire pour compiler.
@@ -313,10 +313,10 @@ l'absence de destination, l'absence d'accès aux notifications, le délai de gr�
 
 ## 12. Diagnostic
 
-Journalisation avec le tag `TeslaWaze` :
+Journalisation avec le tag `Wazaa` :
 
 ```bash
-adb logcat -s TeslaWaze
+adb logcat -s Wazaa
 ```
 
 Principaux messages : décisions de la machine à états, appels Tesla, lancement/arrêt de Waze,
